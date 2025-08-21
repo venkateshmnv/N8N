@@ -1,5 +1,5 @@
 {
-  "name": "stock agent",
+  "name": "Stock Analysis🧦",
   "nodes": [
     {
       "parameters": {
@@ -11,16 +11,16 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -500,
-        -40
+        -1344,
+        480
       ],
-      "id": "25816340-174c-472a-a811-38d8afe6c946",
+      "id": "a87a8d75-474d-47e6-86cd-6a2831547996",
       "name": "Telegram Trigger",
       "webhookId": "4eea8502-ed5b-4485-a8a8-fbb4ac0a871d",
       "credentials": {
         "telegramApi": {
-          "id": "q1AFQgurQoVHz2Oj",
-          "name": "Telegram account 4"
+          "id": "Ou0CVDxOLCzm86AE",
+          "name": "TelegramConnection"
         }
       }
     },
@@ -31,10 +31,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -100,
-        -40
+        -944,
+        480
       ],
-      "id": "89b52fef-2337-4b19-81fb-d194d31a342b",
+      "id": "2cd2d945-012f-4d4d-ba21-6c77b09c73f6",
       "name": "Code"
     },
     {
@@ -44,10 +44,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        760,
-        480
+        -80,
+        992
       ],
-      "id": "64bb479f-e158-4d60-87a8-e70b11ef3729",
+      "id": "9a804433-641f-44a6-9e40-d1e31779435d",
       "name": "Filter News Articles"
     },
     {
@@ -71,15 +71,15 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        1140,
-        480
+        304,
+        992
       ],
-      "id": "3b84c254-86df-4bee-a3db-674fb8524630",
+      "id": "c4fbb67d-0892-4518-a106-4a733ee71ded",
       "name": "Sentiment Analysis",
       "credentials": {
         "openAiApi": {
-          "id": "GgvCwcPhIr8AAP5D",
-          "name": "OpenAi account"
+          "id": "y19aiHnxB1MlR1zl",
+          "name": "OpenAi Connection Agent"
         }
       }
     },
@@ -90,10 +90,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.1,
       "position": [
-        2220,
-        100
+        1392,
+        608
       ],
-      "id": "1de74295-c39b-4532-abd4-ffb8dc6298ab",
+      "id": "ee11ab53-769d-435d-b16d-9adbd8f114c9",
       "name": "Merge Data"
     },
     {
@@ -107,16 +107,16 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        3260,
-        100
+        2432,
+        624
       ],
-      "id": "c1b2b572-3b60-49ff-a0fe-b03eb4343e53",
+      "id": "03ef424b-95cb-4187-9535-f4d74f5c72c9",
       "name": "Telegram",
       "webhookId": "193ad333-0d76-4dd8-8a19-6a49753f11c4",
       "credentials": {
         "telegramApi": {
-          "id": "q1AFQgurQoVHz2Oj",
-          "name": "Telegram account 4"
+          "id": "Ou0CVDxOLCzm86AE",
+          "name": "TelegramConnection"
         }
       }
     },
@@ -133,15 +133,15 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        2640,
-        280
+        1808,
+        800
       ],
-      "id": "12fab828-61eb-4002-a661-e7c4da2bb98e",
+      "id": "730839d1-e70a-41e4-ba68-d53cacaa41f6",
       "name": "OpenAI",
       "credentials": {
         "openAiApi": {
-          "id": "GgvCwcPhIr8AAP5D",
-          "name": "OpenAi account"
+          "id": "y19aiHnxB1MlR1zl",
+          "name": "OpenAi Connection Agent"
         }
       }
     },
@@ -155,10 +155,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -540,
-        -120
+        -1376,
+        400
       ],
-      "id": "872913cb-954a-4aaf-a4bc-e188b7212af9",
+      "id": "b7ed3a94-c8bf-4f11-8b9f-601abc16be67",
       "name": "Sticky Note"
     },
     {
@@ -171,10 +171,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        440,
-        -620
+        -400,
+        -112
       ],
-      "id": "815f74d6-28fe-423f-8d2f-9d7926498624",
+      "id": "9bc6a9e0-5f02-4bbb-8bec-af99a140bfc1",
       "name": "Sticky Note1"
     },
     {
@@ -187,10 +187,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        440,
-        -360
+        -400,
+        160
       ],
-      "id": "bf08d9b9-1d67-4661-8614-ce6d2a156ee9",
+      "id": "a30b4606-af3b-4539-9614-64ada735e5f9",
       "name": "Sticky Note2"
     },
     {
@@ -203,10 +203,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        440,
-        -120
+        -400,
+        400
       ],
-      "id": "86b5ef60-3476-41d5-9dd3-cf7f3275f1f2",
+      "id": "b772e407-0b1b-4f8a-9ad7-16c72d3218e1",
       "name": "Sticky Note3"
     },
     {
@@ -219,10 +219,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        440,
-        400
+        192,
+        912
       ],
-      "id": "fcbf8ba6-84b0-4c3d-b7d7-d57aba7de5f3",
+      "id": "f89bd1c0-d7bd-4965-a4f2-dcfedfe64a4a",
       "name": "Sticky Note4"
     },
     {
@@ -235,10 +235,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1080,
-        400
+        -352,
+        944
       ],
-      "id": "c16ce927-6a80-43da-991a-9c9146a7bca2",
+      "id": "723ca3ae-d27b-4128-8e01-98a1515e6672",
       "name": "Sticky Note6"
     },
     {
@@ -250,10 +250,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1080,
-        20
+        240,
+        528
       ],
-      "id": "fa6476ff-8da4-49ea-857f-5537e6dd49bf",
+      "id": "87bd96e3-7d5c-49c5-ac49-c3e3f40bcd77",
       "name": "Sticky Note7"
     },
     {
@@ -266,10 +266,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2180,
-        40
+        1344,
+        560
       ],
-      "id": "bac33272-8c18-4771-a9c6-14df6c1e3ac7",
+      "id": "cbc63a27-4b48-460c-b726-4052d572669c",
       "name": "Sticky Note8"
     },
     {
@@ -282,10 +282,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        3020,
-        40
+        2192,
+        560
       ],
-      "id": "ccb0127c-c24e-4cca-988d-74fb78394824",
+      "id": "f491eca0-18de-4d67-ba9e-b14eeeeebae1",
       "name": "Sticky Note9"
     },
     {
@@ -296,10 +296,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        480,
-        480
+        -352,
+        992
       ],
-      "id": "5ddd6f36-5519-4b5d-bedc-361a68101f3d",
+      "id": "9a27caa4-a40b-465a-b922-ab1ac4449cc3",
       "name": "Stock Articles"
     },
     {
@@ -312,10 +312,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        440,
-        140
+        -400,
+        656
       ],
-      "id": "80d12275-2787-470d-8b63-720e84348bee",
+      "id": "2fcdf001-b152-435e-8e47-d595f844dabd",
       "name": "Sticky Note10"
     },
     {
@@ -326,10 +326,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        480,
-        220
+        -352,
+        736
       ],
-      "id": "a1f4c1f8-0637-4bf4-8685-23efbaca5d16",
+      "id": "2ddfe8a9-d5e9-45a9-beb8-f42eb7d317a1",
       "name": "1 Week Candles"
     },
     {
@@ -340,10 +340,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        480,
-        -40
+        -352,
+        480
       ],
-      "id": "64e0d2df-6ec9-42ab-9e6b-832fca457749",
+      "id": "c40cddf7-5a3e-465e-8174-4e8548e0c5ad",
       "name": "1 Day candles"
     },
     {
@@ -354,10 +354,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        480,
-        -280
+        -352,
+        240
       ],
-      "id": "1053eab1-5442-430c-9cf6-946d93f110a8",
+      "id": "5eac0075-ebcd-464d-9906-44997db9b7cd",
       "name": "1 Hour Candles"
     },
     {
@@ -368,10 +368,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        480,
-        -540
+        -352,
+        -32
       ],
-      "id": "b7b5a813-0a98-4b78-a1d4-49969e623dd1",
+      "id": "306c93eb-def5-4f96-8e4e-3761574eed1d",
       "name": "15 Minute Candles"
     },
     {
@@ -383,13 +383,13 @@
           "parameters": [
             {
               "name": "x-api-key",
-              "value": "[api-key]"
+              "value": "UEn06MZjfY1Y8UNVjzEY13SW7PwbGDi41kEjReaj"
             }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"theme\": \"dark\",\n  \"interval\": \"1D\",\n  \"from\": \"{{ $json.from }}\",\n  \"to\": \"{{ $json.to }}\",\n  \"symbol\": \"NASDAQ:{{ $('Combine Stock Data with Sentiment Data').first().json.Ticker }}\",\n  \"override\": {\n    \"showStudyLastValue\": false\n  },\n  \"studies\": [\n    {\n      \"name\": \"Volume\",\n      \"forceOverlay\": true\n    },\n    {\n      \"name\": \"MACD\"\n    },\n    {\n      \"name\": \"Relative Strength Index\"\n    }\n  ]\n}",
+        "jsonBody": "={\n  \"theme\": \"dark\",\n  \"interval\": \"1W\",\n  \"from\": \"{{ $json.from }}\",\n  \"to\": \"{{ $json.to }}\",\n  \"symbol\": \"BSE:{{ $('Combine Stock Data with Sentiment Data').first().json.Ticker.split('.')[0] }}\",\n  \"override\": {\n    \"showStudyLastValue\": false\n  },\n  \"studies\": [\n    {\n      \"name\": \"Volume\",\n      \"forceOverlay\": true\n    },\n    {\n      \"name\": \"MACD\"\n    },\n    {\n      \"name\": \"Relative Strength Index\"\n    }\n  ]\n}",
         "options": {
           "response": {
             "response": {
@@ -402,10 +402,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3680,
-        -20
+        2848,
+        496
       ],
-      "id": "45696b72-8fb7-4a94-b498-adfac885aad4",
+      "id": "281de63d-eb97-4b86-99a1-2f8f41afae4e",
       "name": "Create Chart for 1D Data"
     },
     {
@@ -417,13 +417,13 @@
           "parameters": [
             {
               "name": "x-api-key",
-              "value": "[api-key]"
+              "value": "UEn06MZjfY1Y8UNVjzEY13SW7PwbGDi41kEjReaj"
             }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"theme\": \"dark\",\n  \"interval\": \"1W\",\n  \"from\": \"{{ $json.from }}\",\n  \"to\": \"{{ $json.to }}\",\n  \"symbol\": \"NASDAQ:{{ $('Combine Stock Data with Sentiment Data').first().json.Ticker }}\",\n  \"override\": {\n    \"showStudyLastValue\": false\n  },\n  \"studies\": [\n    {\n      \"name\": \"Volume\",\n      \"forceOverlay\": true\n    },\n    {\n      \"name\": \"MACD\"\n    },\n    {\n      \"name\": \"Relative Strength Index\"\n    }\n  ]\n}",
+        "jsonBody": "={\n  \"theme\": \"dark\",\n  \"interval\": \"1W\",\n  \"from\": \"{{ $json.from }}\",\n  \"to\": \"{{ $json.to }}\",\n  \"symbol\": \"BSE:{{ $('Combine Stock Data with Sentiment Data').first().json.Ticker.split('.')[0] }}\",\n  \"override\": {\n    \"showStudyLastValue\": false\n  },\n  \"studies\": [\n    {\n      \"name\": \"Volume\",\n      \"forceOverlay\": true\n    },\n    {\n      \"name\": \"MACD\"\n    },\n    {\n      \"name\": \"Relative Strength Index\"\n    }\n  ]\n}",
         "options": {
           "response": {
             "response": {
@@ -436,10 +436,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3680,
-        220
+        2848,
+        736
       ],
-      "id": "a50d284d-4420-48b8-bed4-91326eb1ae17",
+      "id": "548936b2-5068-417a-ab37-808fae0ad1d2",
       "name": "Create Chart for 1W data"
     },
     {
@@ -447,10 +447,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.1,
       "position": [
-        1120,
-        -400
+        288,
+        112
       ],
-      "id": "9d8af7a3-0f43-4cba-a5e6-0ded7bf51131",
+      "id": "21253d5f-bf8f-4cf7-bd70-9f91a9637d9c",
       "name": "Merge1"
     },
     {
@@ -460,10 +460,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1300,
-        -400
+        464,
+        112
       ],
-      "id": "e10dc3fd-d2cd-4d5c-a1aa-f0216c24541f",
+      "id": "da9afe30-4913-48e5-8721-0aa25df47456",
       "name": "Combine Short-term Data"
     },
     {
@@ -471,10 +471,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.1,
       "position": [
-        1120,
-        100
+        288,
+        608
       ],
-      "id": "8930a52e-5d11-4706-8dd0-746392030fc6",
+      "id": "b61d116f-6879-4cb6-b376-b671be5ef592",
       "name": "Merge2"
     },
     {
@@ -484,10 +484,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1300,
-        100
+        464,
+        608
       ],
-      "id": "639c9e72-291c-4861-9854-a7d423f17387",
+      "id": "5eb58678-6495-4939-811d-96c67573eafd",
       "name": "Combine Long-term Data"
     },
     {
@@ -500,10 +500,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1080,
-        -480
+        240,
+        32
       ],
-      "id": "e8d34c82-a7dd-4163-bec0-b189b650c64d",
+      "id": "196629b8-706d-4fa2-914f-6b5473ad539e",
       "name": "Sticky Note11"
     },
     {
@@ -513,10 +513,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2420,
-        100
+        1584,
+        608
       ],
-      "id": "ad333e18-4a38-4bf1-a009-ea736c10bf95",
+      "id": "39585ce2-0238-4749-b4db-08a2d71a45b5",
       "name": "Combine Stock Data with Sentiment Data"
     },
     {
@@ -529,10 +529,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1500,
-        -480
+        672,
+        32
       ],
-      "id": "d8c45291-307a-44cf-a5d3-5d66a7045e1e",
+      "id": "594542a8-7857-490c-abf8-0c09e40423dd",
       "name": "Combine Short/Long-term with the Sentiment Analysis"
     },
     {
@@ -546,16 +546,16 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        3900,
-        -20
+        3072,
+        496
       ],
-      "id": "48b101fd-01e9-4a09-877f-da7f880170ea",
+      "id": "bfcf0e5c-3e01-4a76-b03f-87a60ddcb060",
       "name": "Send First chart 1D",
       "webhookId": "0166136e-2c8c-4e41-8d98-9d067ce1230b",
       "credentials": {
         "telegramApi": {
-          "id": "q1AFQgurQoVHz2Oj",
-          "name": "Telegram account 4"
+          "id": "Ou0CVDxOLCzm86AE",
+          "name": "TelegramConnection"
         }
       }
     },
@@ -570,16 +570,16 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        3900,
-        220
+        3088,
+        736
       ],
-      "id": "eb90846b-a6f1-404a-a22a-56d78cf84d74",
+      "id": "41b9c255-96ae-4904-85fe-a5cd474f3d40",
       "name": "Send Second chart 1W",
       "webhookId": "0166136e-2c8c-4e41-8d98-9d067ce1230b",
       "credentials": {
         "telegramApi": {
-          "id": "q1AFQgurQoVHz2Oj",
-          "name": "Telegram account 4"
+          "id": "Ou0CVDxOLCzm86AE",
+          "name": "TelegramConnection"
         }
       }
     },
@@ -594,10 +594,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.8,
       "position": [
-        1540,
-        -400
+        704,
+        112
       ],
-      "id": "168b830c-940e-4b40-80fa-008e7571e387",
+      "id": "9a5125f6-fb4b-44a2-983c-e8f38e06d922",
       "name": "Short-Term Analysis"
     },
     {
@@ -613,15 +613,15 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        1520,
-        -180
+        688,
+        336
       ],
-      "id": "f17ec329-c763-4a67-8df3-7f143e095986",
+      "id": "a4a28d70-8d72-4580-ac60-d7a2ccfaf207",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "GgvCwcPhIr8AAP5D",
-          "name": "OpenAi account"
+          "id": "y19aiHnxB1MlR1zl",
+          "name": "OpenAi Connection Agent"
         }
       }
     },
@@ -636,10 +636,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.8,
       "position": [
-        1540,
-        100
+        704,
+        608
       ],
-      "id": "c8ecdf6f-8d55-4431-b000-3f723668346c",
+      "id": "346dad46-f4ae-4e54-b4b9-0ff0a81687e2",
       "name": "Long-Term Analysis"
     },
     {
@@ -649,10 +649,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3480,
-        -20
+        2640,
+        496
       ],
-      "id": "acbcabcc-ca32-470c-bf9f-9c31fc0bce20",
+      "id": "d6378fc1-c681-4f16-8dd4-3a7d403963fc",
       "name": "Get the correct date"
     },
     {
@@ -665,10 +665,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1500,
-        20
+        672,
+        528
       ],
-      "id": "cd05660c-30f0-403c-bb55-8e52df9baacd",
+      "id": "52f8af15-7d3a-4978-a753-f5c2d4c2b7dc",
       "name": "Combine Short/Long-term with the Sentiment Analysis1"
     },
     {
@@ -684,15 +684,15 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        1520,
-        320
+        688,
+        832
       ],
-      "id": "4d8a061b-ec53-4645-8f48-ebcb8128b602",
+      "id": "e9f5505d-4dc4-43c3-82d6-194d5c5f8e01",
       "name": "OpenAI1",
       "credentials": {
         "openAiApi": {
-          "id": "GgvCwcPhIr8AAP5D",
-          "name": "OpenAi account"
+          "id": "y19aiHnxB1MlR1zl",
+          "name": "OpenAi Connection Agent"
         }
       }
     },
@@ -706,10 +706,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2600,
-        40
+        1760,
+        560
       ],
-      "id": "3b467d25-81bb-4a3a-87cd-26bb48d3759b",
+      "id": "15df3f28-2e28-46bf-820c-6d50ae3bd267",
       "name": "Sticky Note12"
     },
     {
@@ -719,10 +719,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3080,
-        100
+        2240,
+        608
       ],
-      "id": "d91c4cba-3138-4cdc-b898-b8dbc21de2a8",
+      "id": "cc7ac85a-fc9c-4974-b330-01fb9870c36e",
       "name": "Split Telegram Message"
     },
     {
@@ -732,10 +732,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3480,
-        220
+        2640,
+        736
       ],
-      "id": "d4b1ac11-9fa6-4949-864f-8c8abdd24242",
+      "id": "b194e634-e4d7-4b5d-a267-a874f4ac6e15",
       "name": "Get the correct date1"
     },
     {
@@ -748,10 +748,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        3440,
-        -80
+        2608,
+        432
       ],
-      "id": "5db56c2e-87d9-4742-865e-4a6ffb0e36aa",
+      "id": "fd69521d-c213-4c03-8964-d47a711cb359",
       "name": "Sticky Note13"
     },
     {
@@ -764,10 +764,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        3440,
-        160
+        2608,
+        672
       ],
-      "id": "0c47c946-e8d4-4004-9cf0-c3ee3e37396e",
+      "id": "d30ed9d0-1542-4b18-bf77-aadf5dca2bd7",
       "name": "Sticky Note14"
     },
     {
@@ -787,10 +787,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        100,
-        -40
+        -736,
+        480
       ],
-      "id": "91237531-dfb4-48b0-847d-5a520b47728b",
+      "id": "069769b7-f2ae-4891-9459-fb484a1357a2",
       "name": "Set Ticker"
     },
     {
@@ -801,10 +801,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -300,
-        -40
+        -1136,
+        480
       ],
-      "id": "dc8219fe-5a35-4911-b95f-1a0a2575703a",
+      "id": "45ae6f3a-4302-4a2a-bf31-94d7cc2379ef",
       "name": "Search ticker on yahoo finance"
     },
     {
@@ -814,10 +814,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        760,
-        -280
+        -80,
+        240
       ],
-      "id": "cef4cd1d-b0c7-4314-83fe-183a2a72100f",
+      "id": "dbc5ac88-c1b0-48aa-aa22-9303f6ef43b7",
       "name": "Analysis 1H Candle data"
     },
     {
@@ -827,10 +827,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        760,
-        -540
+        -80,
+        -32
       ],
-      "id": "57f64793-e3d3-44a7-91a7-3dbc76853357",
+      "id": "2728700a-7e74-4205-a3bc-95f10376699b",
       "name": "Analysis 15M Candle data"
     },
     {
@@ -840,10 +840,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        760,
-        -40
+        -80,
+        480
       ],
-      "id": "8a868b47-03ea-4e21-b43a-77264f9035df",
+      "id": "a8ce9576-e716-48ce-9413-00579a047fa9",
       "name": "Analysis 1D Candle data"
     },
     {
@@ -853,10 +853,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        760,
-        220
+        -80,
+        736
       ],
-      "id": "2c554817-088b-45b1-98b4-6e01b01bdbec",
+      "id": "e1e66b67-b91a-45b3-9ad6-85f94f51c8c8",
       "name": "Analysis 1W Candle data"
     },
     {
@@ -870,10 +870,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.8,
       "position": [
-        2660,
-        100
+        1824,
+        608
       ],
-      "id": "371fcfd7-ec6a-4462-8a00-f87f811c7d03",
+      "id": "891d00f2-b199-49f0-98d7-156c8f7b9c95",
       "name": "Full Analysis"
     }
   ],
@@ -1093,11 +1093,6 @@
         ]
       ]
     },
-    "Send First chart 1D": {
-      "main": [
-        []
-      ]
-    },
     "OpenAI Chat Model": {
       "ai_languageModel": [
         [
@@ -1277,11 +1272,11 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "16e273b7-f089-439c-aeb4-6d94ab0b2e44",
+  "versionId": "0502b242-8f18-4913-af53-95f44ba5534c",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "50618e78906785f75ac298c8b090bb3bd6406a17352da71ebb8b85e6df90fa3a"
+    "instanceId": "b12195067235351c1ee76c4fbf27fdfb2cebcc169a0d0fc6cb767999437c2724"
   },
-  "id": "qkld6j8yUBIQJUNr",
+  "id": "0FdSDA0aKPNxG9SF",
   "tags": []
 }
