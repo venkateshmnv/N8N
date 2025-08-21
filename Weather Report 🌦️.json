@@ -1,0 +1,529 @@
+{
+  "name": "Weather Report 🌦️",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Location Selector",
+        "formDescription": "Select a unique location from the list.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Select your location",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Chicago"
+                  },
+                  {
+                    "option": "New York"
+                  },
+                  {
+                    "option": "Miami"
+                  },
+                  {
+                    "option": "Phoenix"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -304,
+        -256
+      ],
+      "id": "f9ea07ba-f54c-471d-9423-c75444c6b77a",
+      "name": "On form submission",
+      "webhookId": "c963c0b6-35a3-4842-8036-2fbef3a77cff"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['Select your location'] }}",
+                    "rightValue": "Chicago",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "27614543-3399-4940-983c-af3a8be0ddf8"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Chicago"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a2a6afb5-202e-45b8-a33b-247ea1099fc1",
+                    "leftValue": "={{ $json['Select your location'] }}",
+                    "rightValue": "New York",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "New York"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b0075813-7401-42c1-9b61-3da8306d0744",
+                    "leftValue": "={{ $json['Select your location'] }}",
+                    "rightValue": "Miami",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Miami"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a9d2120b-7c22-4d19-b22f-9dc44c548640",
+                    "leftValue": "={{ $json['Select your location'] }}",
+                    "rightValue": "Phoenix",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Phoenix"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -112,
+        -288
+      ],
+      "id": "a8cce2a4-5a93-47c7-b497-b5c37018fb3b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ded9013-e1c3-4c77-a578-d239970b5bd3",
+              "name": "latitude",
+              "value": "41.88",
+              "type": "string"
+            },
+            {
+              "id": "8a400a73-0c84-4300-b436-2fe27bcdfe3e",
+              "name": "longitude",
+              "value": "87.63",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        -528
+      ],
+      "id": "8b2c4d0b-d889-4c9b-87bb-494734feaf52",
+      "name": "Chicago"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ded9013-e1c3-4c77-a578-d239970b5bd3",
+              "name": "latitude",
+              "value": "40.71",
+              "type": "string"
+            },
+            {
+              "id": "8a400a73-0c84-4300-b436-2fe27bcdfe3e",
+              "name": "longitude",
+              "value": "74.01",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        -352
+      ],
+      "id": "a764807a-5853-4097-b317-c7c26d71bd4a",
+      "name": "New York"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ded9013-e1c3-4c77-a578-d239970b5bd3",
+              "name": "latitude",
+              "value": "25.76",
+              "type": "string"
+            },
+            {
+              "id": "8a400a73-0c84-4300-b436-2fe27bcdfe3e",
+              "name": "longitude",
+              "value": "80.19",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        -160
+      ],
+      "id": "76e094a0-11cc-4d28-97ad-61ec274234f6",
+      "name": "Miami"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ded9013-e1c3-4c77-a578-d239970b5bd3",
+              "name": "latitude",
+              "value": "33.45",
+              "type": "string"
+            },
+            {
+              "id": "8a400a73-0c84-4300-b436-2fe27bcdfe3e",
+              "name": "longitude",
+              "value": "112.08",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        32
+      ],
+      "id": "89543813-a476-4a4f-900b-0a80e7b16bfc",
+      "name": "Phoenix"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get input data\nconst data = items[0].json;\n\n// Extract the hourly arrays\nconst times = data.hourly.time;\nconst temps = data.hourly.temperature_2m;\n\n// Get today's date (in YYYY-MM-DD format, UTC-based since times are ISO8601 GMT)\nconst today = new Date().toISOString().slice(0, 10);\n\n// Collect all today's temps\nlet todayTemps = [];\nfor (let i = 0; i < times.length; i++) {\n  if (times[i].startsWith(today)) {\n    todayTemps.push(temps[i]);\n  }\n}\n\n// Find today's high and low\nconst high = Math.max(...todayTemps);\nconst low = Math.min(...todayTemps);\n\n// Return as output\nreturn [\n  {\n    json: {\n      high: high,\n      low: low\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        -256
+      ],
+      "id": "efde2765-ded5-467c-a51f-2d8ad7d56682",
+      "name": "Finding High and Low"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.open-meteo.com/v1/forecast?latitude={{ $json.latitude }}&longitude={{ $json.longitude }}&hourly=temperature_2m&temperature_unit=fahrenheit",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        -256
+      ],
+      "id": "d9565249-8e9b-4c0b-94f0-2a4d21b4280c",
+      "name": "Weather pull"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appR8bMee9wg01uv2",
+          "mode": "list",
+          "cachedResultName": "The Weather Center",
+          "cachedResultUrl": "https://airtable.com/appR8bMee9wg01uv2"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblsjZkN8i6BVnTsi",
+          "mode": "list",
+          "cachedResultName": "Weather Data Raw",
+          "cachedResultUrl": "https://airtable.com/appR8bMee9wg01uv2/tblsjZkN8i6BVnTsi"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "High (F)": "={{ $json.high }}",
+            "Low (F)": "={{ $json.low }}",
+            "Location": "={{ $('On form submission').item.json['Select your location'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "High (F)",
+              "displayName": "High (F)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Low (F)",
+              "displayName": "Low (F)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created Time",
+              "displayName": "Created Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1056,
+        -256
+      ],
+      "id": "9de1e21b-281c-4715-b33f-2864abd82c53",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "0KQBnMxUqZQ0WDqj",
+          "name": "Weather Center Connection"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Chicago",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "New York",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Miami",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Phoenix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chicago": {
+      "main": [
+        [
+          {
+            "node": "Weather pull",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New York": {
+      "main": [
+        [
+          {
+            "node": "Weather pull",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Miami": {
+      "main": [
+        [
+          {
+            "node": "Weather pull",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Phoenix": {
+      "main": [
+        [
+          {
+            "node": "Weather pull",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weather pull": {
+      "main": [
+        [
+          {
+            "node": "Finding High and Low",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finding High and Low": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "364a139a-6759-4930-84fe-6f22576ff99c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b12195067235351c1ee76c4fbf27fdfb2cebcc169a0d0fc6cb767999437c2724"
+  },
+  "id": "xIb0VbGiLoZUkHiR",
+  "tags": [
+    {
+      "name": "Meruva",
+      "id": "egcHsQ9X6dnS5MnE",
+      "createdAt": "2025-08-20T11:33:49.360Z",
+      "updatedAt": "2025-08-20T11:33:49.360Z"
+    }
+  ]
+}

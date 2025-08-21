@@ -1,0 +1,1282 @@
+{
+  "name": "Stock Analysis",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1344,
+        480
+      ],
+      "id": "a87a8d75-474d-47e6-86cd-6a2831547996",
+      "name": "Telegram Trigger",
+      "webhookId": "4eea8502-ed5b-4485-a8a8-fbb4ac0a871d",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ou0CVDxOLCzm86AE",
+          "name": "TelegramConnection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = items[0].json;\n\nlet ticker = \"UNKNOWN\";\nif (data.quotes && data.quotes.length > 0) {\n  ticker = data.quotes[0].symbol.toUpperCase();\n}\n\nreturn [{ json: { ticker } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -944,
+        480
+      ],
+      "id": "2cd2d945-012f-4d4d-ba21-6c77b09c73f6",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "const news = $input.first().json.news;\n\n// Sort articles by publish time (newest first)\nnews.sort((a, b) => b.providerPublishTime - a.providerPublishTime);\n\n// Extract only the titles into a single array\nconst headlines = news.map(article => article.title);\n\n// Output as a single JSON object\nreturn [\n  {\n    json: {\n      headlines\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        992
+      ],
+      "id": "9a804433-641f-44a6-9e40-d1e31779435d",
+      "name": "Filter News Articles"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a highly specialized, accurate sentiment analyzer for financial markets, focused on actionable short-term insights for stock traders.\n\nTask:\nAnalyze the overall sentiment of the following list of recent news headlines for a stock. Your goal is to determine the likely impact on the stock's short-term price action.\n\nRequirements:\n\n- Use only the information from the provided headlines and your expert market understanding.\n- Evaluate immediate market reaction, recent news impact, and technical volatility.\n- Classify sentiment as: Positive, Neutral, or Negative.\n- Assign a numerical Score between -1 (extremely negative) and 1 (extremely positive).\n- Indicate the directional Bias: Bullish, Bearish, or Uncertain.\n- Provide a concise, evidence-based Rationale. Reference specific events, companies, or macro trends from the headlines. The rationale must directly address potential short-term price impact and cite the most impactful headlines or patterns. Avoid vague statements.\n- If the headlines contain no actionable information, classify as \"Neutral\" and \"Uncertain\", and explain why.\n- DO NOT use JSON, YAML, or any kind of code block.\n- DO NOT use HTML for the output, except for <b> tags as in the example.\n- Output only in plain markdown, matching the exact schema below.\n\nIf any value cannot be determined, write: N/A\n\nHeadlines:\n{{ $json.headlines.map(h => `- ${h}`).join('\\n') }}\n\n\nOutput in strict markdown, matching the format below. Do not use a code block. Do not use JSON.\n\nExample output:\n\n<b>Sentiment Analysis (Short Term)</b>\nCategory: Positive\n\nScore: 0.7\n\nBias: Bullish\n\nRationale:\nMultiple recent headlines highlight analyst upgrades, increased price targets, and strategic partnerships for Amazon.\nThere is no significant negative news, and several articles point to strong institutional interest.\nThis supports a short-term bullish outlook.\n\nNote:\n\nIf a number is a percentage than add that to the number\nIf a number is a price that add a \"$\" to the number\n\n{{ $now }}",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        304,
+        992
+      ],
+      "id": "c4fbb67d-0892-4518-a106-4a733ee71ded",
+      "name": "Sentiment Analysis",
+      "credentials": {
+        "openAiApi": {
+          "id": "y19aiHnxB1MlR1zl",
+          "name": "OpenAi Connection Agent"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1392,
+        608
+      ],
+      "id": "ee11ab53-769d-435d-b16d-9adbd8f114c9",
+      "name": "Merge Data"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "text": "={{ $json.content }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2432,
+        624
+      ],
+      "id": "03ef424b-95cb-4187-9535-f4d74f5c72c9",
+      "name": "Telegram",
+      "webhookId": "193ad333-0d76-4dd8-8a19-6a49753f11c4",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ou0CVDxOLCzm86AE",
+          "name": "TelegramConnection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1808,
+        800
+      ],
+      "id": "730839d1-e70a-41e4-ba68-d53cacaa41f6",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "y19aiHnxB1MlR1zl",
+          "name": "OpenAi Connection Agent"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Format the ticker",
+        "height": 240,
+        "width": 780,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1376,
+        400
+      ],
+      "id": "b7ed3a94-c8bf-4f11-8b9f-601abc16be67",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Get 15m Candle data from last 7 days\n\n",
+        "height": 240,
+        "width": 500,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -112
+      ],
+      "id": "9bc6a9e0-5f02-4bbb-8bec-af99a140bfc1",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Get 1h Candle data from last month\n",
+        "height": 220,
+        "width": 500,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        160
+      ],
+      "id": "a30b4606-af3b-4539-9614-64ada735e5f9",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Get 1d Candle data from last Year\n",
+        "height": 240,
+        "width": 500,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        400
+      ],
+      "id": "b772e407-0b1b-4f8a-9ad7-16c72d3218e1",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Scrape news about the stock\n\n",
+        "height": 260,
+        "width": 500,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        192,
+        912
+      ],
+      "id": "f89bd1c0-d7bd-4965-a4f2-dcfedfe64a4a",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Create a Sentiment Analysis\n\n",
+        "height": 260,
+        "width": 400,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        944
+      ],
+      "id": "723ca3ae-d27b-4128-8e01-98a1515e6672",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Combine Long-term data\n\n",
+        "height": 260,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        528
+      ],
+      "id": "87bd96e3-7d5c-49c5-ac49-c3e3f40bcd77",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Combine all data\n\n\n",
+        "height": 220,
+        "width": 400,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        560
+      ],
+      "id": "cbc63a27-4b48-460c-b726-4052d572669c",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Send Message to Telegram\n \n\n",
+        "height": 220,
+        "width": 400,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2192,
+        560
+      ],
+      "id": "f491eca0-18de-4d67-ba9e-b14eeeeebae1",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "url": "=https://query1.finance.yahoo.com/v1/finance/search?q={{ $json.Ticker }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -352,
+        992
+      ],
+      "id": "9a27caa4-a40b-465a-b922-ab1ac4449cc3",
+      "name": "Stock Articles"
+    },
+    {
+      "parameters": {
+        "content": "## Get 1w Candle data from the last 5 Years\n",
+        "height": 240,
+        "width": 500,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        656
+      ],
+      "id": "2fcdf001-b152-435e-8e47-d595f844dabd",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "url": "=https://query1.finance.yahoo.com/v8/finance/chart/{{ $json.Ticker }}?interval=1wk&range=5y",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -352,
+        736
+      ],
+      "id": "2ddfe8a9-d5e9-45a9-beb8-f42eb7d317a1",
+      "name": "1 Week Candles"
+    },
+    {
+      "parameters": {
+        "url": "=https://query1.finance.yahoo.com/v8/finance/chart/{{ $json.Ticker }}?interval=1d&range=1y",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -352,
+        480
+      ],
+      "id": "c40cddf7-5a3e-465e-8174-4e8548e0c5ad",
+      "name": "1 Day candles"
+    },
+    {
+      "parameters": {
+        "url": "=https://query1.finance.yahoo.com/v8/finance/chart/{{ $json.Ticker }}?interval=1h&range=1mo",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -352,
+        240
+      ],
+      "id": "5eac0075-ebcd-464d-9906-44997db9b7cd",
+      "name": "1 Hour Candles"
+    },
+    {
+      "parameters": {
+        "url": "=https://query1.finance.yahoo.com/v8/finance/chart/{{ $json.Ticker }}?interval=15m&range=7d",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -352,
+        -32
+      ],
+      "id": "306c93eb-def5-4f96-8e4e-3761574eed1d",
+      "name": "15 Minute Candles"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.chart-img.com/v2/tradingview/advanced-chart",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "UEn06MZjfY1Y8UNVjzEY13SW7PwbGDi41kEjReaj"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"theme\": \"dark\",\n  \"interval\": \"1D\",\n  \"from\": \"{{ $json.from }}\",\n  \"to\": \"{{ $json.to }}\",\n  \"symbol\": \"NSE:{{ $('Combine Stock Data with Sentiment Data').first().json.Ticker }}\",\n  \"override\": {\n    \"showStudyLastValue\": false\n  },\n  \"studies\": [\n    {\n      \"name\": \"Volume\",\n      \"forceOverlay\": true\n    },\n    {\n      \"name\": \"MACD\"\n    },\n    {\n      \"name\": \"Relative Strength Index\"\n    }\n  ]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "chart-img.png.1D"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2848,
+        496
+      ],
+      "id": "281de63d-eb97-4b86-99a1-2f8f41afae4e",
+      "name": "Create Chart for 1D Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.chart-img.com/v2/tradingview/advanced-chart",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "UEn06MZjfY1Y8UNVjzEY13SW7PwbGDi41kEjReaj"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"theme\": \"dark\",\n  \"interval\": \"1W\",\n  \"from\": \"{{ $json.from }}\",\n  \"to\": \"{{ $json.to }}\",\n  \"symbol\": \"BSE:{{ $('Combine Stock Data with Sentiment Data').first().json.Ticker.split('.')[0] }}\",\n  \"override\": {\n    \"showStudyLastValue\": false\n  },\n  \"studies\": [\n    {\n      \"name\": \"Volume\",\n      \"forceOverlay\": true\n    },\n    {\n      \"name\": \"MACD\"\n    },\n    {\n      \"name\": \"Relative Strength Index\"\n    }\n  ]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "chart-img.png.1W"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2848,
+        736
+      ],
+      "id": "548936b2-5068-417a-ab37-808fae0ad1d2",
+      "name": "Create Chart for 1W data"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        288,
+        112
+      ],
+      "id": "21253d5f-bf8f-4cf7-bd70-9f91a9637d9c",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      type: \"Short-term data\",\n      data: $input.all().map(item => item.json)\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        112
+      ],
+      "id": "da9afe30-4913-48e5-8721-0aa25df47456",
+      "name": "Combine Short-term Data"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        288,
+        608
+      ],
+      "id": "b61d116f-6879-4cb6-b376-b671be5ef592",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      type: \"Long-term data\",\n      data: $input.all().map(item => item.json)\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        608
+      ],
+      "id": "5eb58678-6495-4939-811d-96c67573eafd",
+      "name": "Combine Long-term Data"
+    },
+    {
+      "parameters": {
+        "content": "## Combine Short-term Data\n\n",
+        "height": 260,
+        "width": 400,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        32
+      ],
+      "id": "196629b8-706d-4fa2-914f-6b5473ad539e",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      \"ShortTermAnalysis\": $('Short-Term Analysis').first().json.output,\n      \"LongTermAnalysis\": $('Long-Term Analysis').first().json.output,\n      \"SentimentAnalysis\": $('Sentiment Analysis').first().json.message.content,\n      \"Ticker\": $('Set Ticker').first().json.Ticker\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        608
+      ],
+      "id": "39585ce2-0238-4749-b4db-08a2d71a45b5",
+      "name": "Combine Stock Data with Sentiment Data"
+    },
+    {
+      "parameters": {
+        "content": "## Create Short-Term analysis\n\n\n",
+        "height": 260,
+        "width": 340,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        672,
+        32
+      ],
+      "id": "594542a8-7857-490c-abf8-0c09e40423dd",
+      "name": "Combine Short/Long-term with the Sentiment Analysis"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "binaryData": true,
+        "binaryPropertyName": "chart-img.png.1D",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3072,
+        496
+      ],
+      "id": "bfcf0e5c-3e01-4a76-b03f-87a60ddcb060",
+      "name": "Send First chart 1D",
+      "webhookId": "0166136e-2c8c-4e41-8d98-9d067ce1230b",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ou0CVDxOLCzm86AE",
+          "name": "TelegramConnection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "binaryData": true,
+        "binaryPropertyName": "chart-img.png.1W",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3088,
+        736
+      ],
+      "id": "41b9c255-96ae-4904-85fe-a5cd474f3d40",
+      "name": "Send Second chart 1W",
+      "webhookId": "0166136e-2c8c-4e41-8d98-9d067ce1230b",
+      "credentials": {
+        "telegramApi": {
+          "id": "Ou0CVDxOLCzm86AE",
+          "name": "TelegramConnection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=here is Short-term market data for {{ $json.data[0].Name }}/{{ $json.data[0].Ticker }} for you to reference:\n\nShortTerm Data:\n{{ JSON.stringify($json.data, null, 2) }}\n",
+        "options": {
+          "systemMessage": "=You are a professional stock analyst assistant.\nYou receive structured JSON with two objects:\n\nOne object for 15-minute candles, 7-day range (15m_7d)\n\nOne object for 1-hour candles, 1-month range (1h_1mo)\n\nAlways clearly mention the timeframe and period for every metric in the summary.\n\nFollow these steps and formatting rules:\n\n1. Context Sentence\nStart with 1–2 factual sentences summarizing the overall short-term technical outlook, explicitly referencing both intervals.\n\nExample:\n“Apple Inc. (AAPL) displays a bearish momentum on the 15-minute (7d) chart but bullish strength on the 1-hour (1mo) chart, with significant volume spikes recently detected on both intervals.”\n\n2. Short-Term Outlook Table\nPresent the following side-by-side (15m/7d and 1h/1mo):\n\nTrend:\n\nTrend (15m, 7d): ...\nTrend (1h, 1mo): ...\n\nMajor Support:\n\nSupport (15m, 7d): ...\nSupport (1h, 1mo): ...\n\nMajor Resistance:\n\nResistance (15m, 7d): ...\nResistance (1h, 1mo): ...\n\nVolatility (ATR %):\n\nVolatility_ATR_pct (15m, 7d): ...\nVolatility_ATR_pct (1h, 1mo): ...\n\nAverage Volume (SMA 5):\n\nVolume_SMA5 (15m, 7d): ...\nVolume_SMA5 (1h, 1mo): ...\n\n3. Technical Summary\nList all metrics with their timeframe and period:\n\nRSI (15m, 7d): ...\nRSI (1h, 1mo): ...\n\nMACD (15m, 7d): ...\nMACD (1h, 1mo): ...\n\nMA20 (15m, 7d): ... (Slope: ...)\nMA20 (1h, 1mo): ... (Slope: ...)\n\nVolume_Trend (15m, 7d): ...\nVolume_Trend (1h, 1mo): ...\n\nKey Pattern (15m, 7d): ...\nKey Pattern (1h, 1mo): ...\n\n4. Short-Term Trading Plan\nReport the plan from each timeframe separately:\n\nTrading Plan (15m, 7d):\n\nBias: ...\nEntry Price: ...\nStop Loss: ...\nTake Profit: ...\n\nTrading Plan (1h, 1mo):\n\nBias: ...\nEntry Price: ...\nStop Loss: ...\nTake Profit: ...\n\nIn one concise line, explain how these values are determined (referencing trend, RSI, MACD, support/resistance, and rules).\n\nExample:\n“Bias is set based on trend, RSI, and MACD. Entry is the latest close, stop-loss just below support, and take-profit near the next resistance (or calculated as per rules if not available).”\n\n5. Key Observations\n\nVolume Spike (15m, 7d): Yes/No, specify bar(s) and relative size if present.\n\nUnusual Gap (15m, 7d): Yes/No, specify bar(s) and % gap if present.\n\nVolume Spike (1h, 1mo): Yes/No, specify bar(s) and relative size if present.\n\nUnusual Gap (1h, 1mo): Yes/No, specify bar(s) and % gap if present.\n\n6. Conclusion\nEnd with 1–2 factual sentences recapping the main signals, highlighting risk/reward, and noting significant spikes or gaps.\n\nFor each indicator, add a short comment on whether the value is positive, negative, or neutral for the outlook, strictly based on its number and definition (e.g. “RSI 67: Slightly overbought, neutral to positive for momentum”).\n\nOutput Rules\nAll numeric outputs: round to 2 decimals.\n\nNever invent data or conclusions; everything must be derived directly from the input JSON.\n\nIf a metric is missing, state N/A.\n\nAll metrics must clearly mention the interval and range used.\n\nNo generic fluff—only precise, actionable insights.\n\nIf Stop_Loss or Take_Profit is \"N/A\", always calculate and display these values as:\n\nStop Loss = Support × 0.995\n\nTake Profit = Resistance × 1.01\nAlways show these calculated values unless Support or Resistance is missing from the data (do not say “calculated”).\n\nOutput Format\nFormat the report in well-structured Markdown, clearly using bold for headers and clear bullet/line separation for each metric. NEVER use a markdown table, ONLY use the given output format that is used in the example:\n\nExample Output Structure:\n\n<b>AAPL (Apple Inc.) Short-Term Technical Analysis</b>\n\n<b>Context:</b>\nApple Inc. (AAPL) displays a bearish momentum on the 15-minute (7d) chart but bullish strength on the 1-hour (1mo) chart, with significant volume spikes recently detected on both intervals.\n\n<br>\n<b>Short-Term Outlook:</b>\n\nTrend (15m, 7d): Down\nTrend (1h, 1mo): Up\n\nMajor Support (15m, 7d): $196.78\nMajor Support (1h, 1mo): $193.25\n\nMajor Resistance (15m, 7d): $206.24\nMajor Resistance (1h, 1mo): $213.94\n\nVolatility_ATR_pct (15m, 7d): 0.32%\nVolatility_ATR_pct (1h, 1mo): 0.79%\n\nAverage Volume (SMA 5) (15m, 7d): 1,058,040\nAverage Volume (SMA 5) (1h, 1mo): 2,381,262\n\n<br>\n<b>Technical Summary:</b>\n\nRSI (15m, 7d): 49.8 (neutral, sideways momentum)\nRSI (1h, 1mo): 57.2 (positive for bullish continuation)\n\nMACD (15m, 7d): -0.11 (bearish, momentum fading)\nMACD (1h, 1mo): 0.66 (bullish, positive crossover)\n\nMA20 (15m, 7d): $203.13 (Slope: Down, negative)\nMA20 (1h, 1mo): $202.73 (Slope: Up, positive)\n\nVolume_Trend (15m, 7d): Down (neutral to negative)\nVolume_Trend (1h, 1mo): Down (neutral to negative)\n\nKey Pattern (15m, 7d): Sideways consolidation\nKey Pattern (1h, 1mo): Sideways consolidation\n\n<br>\n<b>Trading Plan (15m, 7d):</b>\n\nBias: Bearish\nEntry Price: $202.82\nStop Loss: $195.80\nTake Profit: $194.81\n\n<b>Trading Plan (1h, 1mo):</b>\n\nBias: Bullish\nEntry Price: $202.82\nStop Loss: $192.28\nTake Profit: $216.08\n\nBias is set based on trend, RSI, and MACD. Entry is the latest close, stop-loss just below support, and take-profit near the next resistance (or calculated as per rules if not available).\n\n<br>\n<b>Key Observations:</b>\n\n• Volume Spike (15m, 7d): Yes (e.g. bar 0: 6,398,376 vs avg 1,426,552)\n• Unusual Gap (15m, 7d): Yes (bar 52: 1.57%)\n\n• Volume Spike (1h, 1mo): Yes (e.g. bar 0: 17,363,317 vs avg 5,871,595)\n• Unusual Gap (1h, 1mo): Yes (bar 35: 6.26%, bar 98: 3.83%, etc.)\n\n<br>\n<b>Conclusion:</b>\n\nThe 15m chart signals bearish short-term risk with active selling and multiple large volume spikes, while the 1h chart suggests early signs of recovery. Monitor both intervals closely for momentum shifts and manage risk accordingly.\n\nIf a value is a percentage, add \"%\" to the number.\nIf a value is a price, add \"$\" to the number.\n\nStop tokens:\nEnd output after the conclusion. Do not add further comments or explanations.\n\n\n{{ $now }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        704,
+        112
+      ],
+      "id": "9a5125f6-fb4b-44a2-983c-e8f38e06d922",
+      "name": "Short-Term Analysis"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        688,
+        336
+      ],
+      "id": "a4a28d70-8d72-4580-ac60-d7a2ccfaf207",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "y19aiHnxB1MlR1zl",
+          "name": "OpenAi Connection Agent"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=here is combined market data for {{ $json.data[0].Name }}/{{ $json.data[0].Ticker }} for you to reference:\n\nLongTerm Data:\n{{ JSON.stringify($json.data, null, 2) }}\n",
+        "options": {
+          "systemMessage": "=You are a professional stock analyst assistant. You receive structured JSON with two objects:\n\nOne object for 1D candles, 1Y range (1d_1y)\n\nOne object for 1W candles, 5Y range (1w_5y)\n\nAlways clearly mention the timeframe and period for every metric in the summary.\n\nFollow these steps and formatting rules:\n\n1. Context Sentence\nStart with 1–2 factual sentences summarizing the overall long-term technical outlook, explicitly referencing both intervals.\n\nExample:\n\n“AMZN (Amazon.com, Inc.) shows a bullish trend on both the daily (1D, 1Y) and weekly (1W, 5Y) charts, supported by positive momentum and strong support levels.”\n\n2. Long-Term Outlook Table\nPresent the following side-by-side (1D/1Y and 1W/5Y):\n\nTrend:\n\n- Trend (1D, 1Y): ...\n- Trend (1W, 5Y): ...\n\nMajor Support:\n\n- Support (1D, 1Y): ...\n- Support (1W, 5Y): ...\n\nMajor Resistance:\n\n- Resistance (1D, 1Y): ...\n- Resistance (1W, 5Y): ...\n\n52-Week High/Low (1D, 1Y):\n\n- 52-Week High: ...\n- 52-Week Low: ...\n\nAverage Daily Volume:\n\n- Volume_SMA20 (1D, 1Y): ...\n- Volume_SMA20 (1W, 5Y): ...\n\nVolatility (ATR %):\n\n- Volatility_ATR_pct (1D, 1Y): ...\n- Volatility_ATR_pct (1W, 5Y): ...\n\n3. Technical Summary\nList all metrics with their timeframe and period:\n\n- RSI (1D, 1Y): ...\n- RSI (1W, 5Y): ...\n\n- MACD (1D, 1Y): ...\n- MACD (1W, 5Y): ...\n\n- MA50 (1D, 1Y): ... (Slope: ...)\n- MA50 (1W, 5Y): ... (Slope: ...)\n\n- MA200 (1D, 1Y): ... (Slope: ...)\n- MA200 (1W, 5Y): ... (Slope: ...)\n\n- Volume_Trend (1D, 1Y): ...\n- Volume_Trend (1W, 5Y): ...\n\n4. Long-Term Trading Plan\nReport the plan from the weekly (1W, 5Y) data only:\n\n- Bias (1W, 5Y): Bullish / Bearish / Neutral (based on the defined rules)\n- Entry Price (1W, 5Y): ...\n- Stop Loss (1W, 5Y): ...\n- Take Profit (1W, 5Y): ...\n\nExplain, in one sentence, how these are determined, referencing the rules:\n\n“The bias is determined by trend, RSI, and MACD. Entry price is set at the latest close (1W, 5Y), stop-loss just below support, and take-profit based on resistance.”\n\n5. Key Observations\n\n- Volume Spike (1D, 1Y): Yes/No, give details if present.\n- Unusual Gap (1D, 1Y): Yes/No, give details if present.\n\n6. Conclusion\nEnd with 1–2 factual sentences that recap the overall risk/reward and main signals from both intervals.\n\nFor each indicator, add a short comment on whether the value is positive, negative, or neutral for the outlook, based strictly on its number and definition (e.g. “RSI 67: Slightly overbought, neutral to positive for momentum”).\n\nExample:\n\n“Overall, both the daily and weekly analyses suggest a positive technical structure with manageable risk, though traders should monitor for any large volume spikes or unusual gaps as possible turning points.”\n\n7. Output Rules\n\n- All numeric outputs: round to 2 decimals.\n- Never invent any data or conclusions: everything must be derived directly from the input JSON.\n- If a metric cannot be determined, state N/A.\n- All metrics must clearly mention the interval and range used.\n- No generic fluff; only precise, actionable insights.\n- If you spot a clear chart pattern, name it; otherwise use a short, factual descriptive phrase.\n- If the \"Stop_Loss\" or \"Take_Profit\" field is \"N/A\", always calculate and display these values as follows:\n- Stop Loss = Support (1W, 5Y) × 0.995\n- Take Profit = Resistance (1W, 5Y) × 1.01\nAlways show these calculated values unless Support or Resistance is missing from the data. do not say (Calulated)\n\n8. Output Format\nFormat the report in well-structured Markdown, clearly using bold for headers and clear bullet/line separation for each metric. NEVER use a markdown table, ONLY use the given output format that is used in the example:\n\nExample Output Structure:\n\n<b>AMZN (Amazon.com, Inc.) Technical Analysis</b>\n\n<b>Context:</b>  \nAMZN shows a bullish structure on both daily (1D, 1Y) and weekly (1W, 5Y) intervals, with consistent positive momentum and strong support zones.\n\n\n<b>Long-Term Outlook:</b> \n\n- Trend (1D, 1Y): Up  \n- Trend (1W, 5Y): Up\n\n- Major Support (1D, 1Y): 161.38  \n- Major Support (1W, 5Y): 151.61\n\n- Major Resistance (1D, 1Y): 214.84  \n- Major Resistance (1W, 5Y): 242.52 \n\n- 52-Week High (1D, 1Y): 242.06  \n- 52-Week Low (1D, 1Y): 161.02  \n\n- Average Daily Volume (1D, 1Y): 40,156,781  \n\n- Volatility_ATR_pct (1D, 1Y): 2.89  \n- Volatility_ATR_pct (1W, 5Y): 2.89  \n\n\n<b>Technical Summary:</b> \n\n- RSI (1D, 1Y): 45.58 (neutral, no overbought/oversold signal)  \n- RSI (1W, 5Y): 45.69 (neutral) \n\n- MACD (1D, 1Y): 3.94 (positive momentum)  \n- MACD (1W, 5Y): 3.94 (positive momentum) \n\n- MA50 (1D, 1Y): 192.40 (Slope: Up, positive)  \n- MA50 (1W, 5Y): 192.40 (Slope: Up, positive) \n\n- MA200 (1D, 1Y): 201.89 (Slope: Up, positive)  \n- MA200 (1W, 5Y): 201.89 (Slope: Up, positive) \n\n- Volume_Trend (1D, 1Y): Down (slightly negative)  \n- Volume_Trend (1W, 5Y): Down (slightly negative)  \n\n\n<b>Long-Term Trading Plan (1W, 5Y):</b> \n\n- Bias: Bullish (uptrend, neutral RSI, positive MACD)  \n- Entry Price: 185.50  \n- Stop Loss: 150.09  \n- Take Profit: 247.37  \nThe bias is determined by trend, RSI, and MACD. Entry price is the latest weekly close, stop-loss is just below support, and take-profit is just above resistance.\n\n\n<b>Key Observations (1D, 1Y):</b>  \n\n• Volume Spike: Yes (multiple detected, e.g. at bar 19: 109,327,100 vs avg 53,763,965) \n\n• Unusual Gap: Yes (several gaps, e.g. +9.41% at index 41, date 1722605400)  \n\n\n<b>Conclusion:</b>  \n\nBoth intervals suggest a bullish technical setup. Risk remains moderate if support holds; pay attention to recent volume spikes and large price gaps for early trend reversal signals.\n\nStop tokens:\nEnd your output after the conclusion. Do not add further comments or explanations.\n\n\nNote:\n\nIf a number is a percentage than add that to the number\nIf a number is a price that add a \"$\" to the number\n\n\n{{ $now }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        704,
+        608
+      ],
+      "id": "346dad46-f4ae-4e54-b4b9-0ff0a81687e2",
+      "name": "Long-Term Analysis"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst to = now.toISOString().split('.')[0] + '.000Z';\nconst fromDate = new Date(now);\nfromDate.setFullYear(fromDate.getFullYear() - 1);\nconst from = fromDate.toISOString().split('.')[0] + '.000Z';\n\nreturn {\n  from,\n  to,\n  now: to\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        496
+      ],
+      "id": "d6378fc1-c681-4f16-8dd4-3a7d403963fc",
+      "name": "Get the correct date"
+    },
+    {
+      "parameters": {
+        "content": "## Create Long-Term analysis\n\n\n",
+        "height": 260,
+        "width": 340,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        672,
+        528
+      ],
+      "id": "52f8af15-7d3a-4978-a753-f5c2d4c2b7dc",
+      "name": "Combine Short/Long-term with the Sentiment Analysis1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        688,
+        832
+      ],
+      "id": "e9f5505d-4dc4-43c3-82d6-194d5c5f8e01",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "y19aiHnxB1MlR1zl",
+          "name": "OpenAi Connection Agent"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Create Final Analysis\n\n\n\n",
+        "height": 220,
+        "width": 400,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        560
+      ],
+      "id": "15df3f28-2e28-46bf-820c-6d50ae3bd267",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputText = $json[\"output\"] || \"\";\nif (typeof inputText !== \"string\") {\n  throw new Error(\"Input must be a string\");\n}\nconst mid = Math.ceil(inputText.length / 2);\nconst firstHalf = inputText.substring(0, mid);\nconst secondHalf = inputText.substring(mid);\nreturn [\n  { json: {blockNumber: 1, content: firstHalf } },\n  { json: {blockNumber: 2, content: secondHalf } },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        608
+      ],
+      "id": "cc7ac85a-fc9c-4974-b330-01fb9870c36e",
+      "name": "Split Telegram Message"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst to = now.toISOString().split('.')[0] + '.000Z';\nconst fromDate = new Date(now);\nfromDate.setFullYear(fromDate.getFullYear() - 5);\nconst from = fromDate.toISOString().split('.')[0] + '.000Z';\n\nreturn {\n  from,\n  to,\n  now: to\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        736
+      ],
+      "id": "b194e634-e4d7-4b5d-a267-a874f4ac6e15",
+      "name": "Get the correct date1"
+    },
+    {
+      "parameters": {
+        "content": "## Create Chart 1D\n \n\n",
+        "height": 220,
+        "width": 680,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        432
+      ],
+      "id": "fd69521d-c213-4c03-8964-d47a711cb359",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "## Create chart 1 Week\n\n \n\n",
+        "height": 220,
+        "width": 680,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        672
+      ],
+      "id": "d30ed9d0-1542-4b18-bf77-aadf5dca2bd7",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f46dd823-bde1-483b-8921-b20409e5f5ab",
+              "name": "Ticker",
+              "value": "={{ $json.ticker }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -736,
+        480
+      ],
+      "id": "069769b7-f2ae-4891-9459-fb484a1357a2",
+      "name": "Set Ticker"
+    },
+    {
+      "parameters": {
+        "url": "=https://query1.finance.yahoo.com/v1/finance/search?q={{$json[\"message\"][\"text\"]}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1136,
+        480
+      ],
+      "id": "45ae6f3a-4302-4a2a-bf31-94d7cc2379ef",
+      "name": "Search ticker on yahoo finance"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json.chart.result[0];\nconst meta = data.meta;\nconst close = data.indicators.quote[0].close;\nconst open = data.indicators.quote[0].open;\nconst high = data.indicators.quote[0].high;\nconst low = data.indicators.quote[0].low;\nconst volume = data.indicators.quote[0].volume;\nconst timestamps = data.timestamp;\n\n// -- RSI(14)\nfunction calcRSI(closes, period = 14) {\n  if (closes.length < period + 1) return null;\n  let gains = 0, losses = 0;\n  for (let i = closes.length - period; i < closes.length; i++) {\n    const diff = closes[i] - closes[i - 1];\n    if (diff > 0) gains += diff;\n    else losses -= diff;\n  }\n  let avgGain = gains / period, avgLoss = losses / period;\n  let rs = avgGain / (avgLoss || 1e-9);\n  let rsi = 100 - (100 / (1 + rs));\n  return Number(rsi.toFixed(1));\n}\nconst rsi14 = calcRSI(close);\n\n// -- MACD\nfunction EMA(arr, period) {\n  const k = 2 / (period + 1);\n  let emaArr = [arr[0]];\n  for (let i = 1; i < arr.length; i++) {\n    emaArr.push(arr[i] * k + emaArr[i - 1] * (1 - k));\n  }\n  return emaArr;\n}\nfunction calcMACD(closes) {\n  if (closes.length < 26) return { macd: null, signal: null };\n  const ema12 = EMA(closes, 12);\n  const ema26 = EMA(closes, 26);\n  const macdArr = ema12.map((val, i) => val - (ema26[i] || 0));\n  const signalArr = EMA(macdArr, 9);\n  return {\n    macd: Number(macdArr.at(-1).toFixed(2)),\n    signal: Number(signalArr.at(-1).toFixed(2))\n  };\n}\nconst macd = calcMACD(close);\n\n// -- MA20 + slope\nfunction SMA(arr, period) {\n  if (arr.length < period) return null;\n  return arr.slice(-period).reduce((a, b) => a + b, 0) / period;\n}\nconst ma20 = Number(SMA(close, 20)?.toFixed(2));\nconst prev_ma20 = Number(SMA(close.slice(0, -1), 20)?.toFixed(2));\nconst slope_ma20 = (ma20 > prev_ma20) ? \"Up\" : (ma20 < prev_ma20) ? \"Down\" : \"Flat\";\n\n// -- Volatility (ATR%)\nfunction avgATRpct(highs, lows, closes) {\n  let tr = [];\n  for (let i = 1; i < closes.length; i++) {\n    const hl = highs[i] - lows[i];\n    const hc = Math.abs(highs[i] - closes[i - 1]);\n    const lc = Math.abs(lows[i] - closes[i - 1]);\n    tr.push(Math.max(hl, hc, lc) / closes[i] * 100);\n  }\n  return Number((tr.reduce((a, b) => a + b, 0) / tr.length).toFixed(2));\n}\nconst volatility = avgATRpct(high, low, close);\n\n// -- Support/Resistance\nconst support = Number(Math.min(...low).toFixed(2));\nconst resistance = Number(Math.max(...high).toFixed(2));\n\n// -- Trend\nlet trend = \"Sideways\";\nif (close.at(-1) > ma20 && slope_ma20 === \"Up\") trend = \"Up\";\nelse if (close.at(-1) < ma20 && slope_ma20 === \"Down\") trend = \"Down\";\n\n// -- Volume Trend (5-bar SMA)\nfunction SMAvol(volumes, period = 5) {\n  if (volumes.length < period) return null;\n  return volumes.slice(-period).reduce((a, b) => a + b, 0) / period;\n}\nconst smaVol5 = SMAvol(volume, 5);\nconst volTrend = volume.at(-1) > smaVol5 ? \"Up\" : \"Down\";\n\n// -- Key Pattern (last 30 bars)\nfunction getKeyPattern(highs, lows) {\n  const bars = 30;\n  if (highs.length < bars || lows.length < bars) return \"Not enough data\";\n  const h = highs.slice(-bars), l = lows.slice(-bars);\n  let up = true, down = true;\n  for (let i = 1; i < bars; i++) {\n    if (h[i] <= h[i - 1] || l[i] <= l[i - 1]) up = false;\n    if (h[i] >= h[i - 1] || l[i] >= l[i - 1]) down = false;\n  }\n  if (up) return \"Up-channel\";\n  if (down) return \"Down-channel\";\n  return \"Sideways consolidation\";\n}\nconst keyPattern = getKeyPattern(high, low);\n\n// -- Volume Spike: any bar where volume >= 2 × avg volume\nconst avgVol = volume.reduce((a, b) => a + b, 0) / volume.length;\nconst volSpikes = [];\nfor (let i = 0; i < volume.length; i++) {\n  if (volume[i] >= 2 * avgVol) {\n    volSpikes.push({ bar: i, volume: volume[i], avg: avgVol });\n  }\n}\nconst volSpikeText = volSpikes.length > 0\n  ? volSpikes.map(v => `Bar ${v.bar}: vol=${v.volume}, avg=${Math.round(v.avg)}`).join(\"; \")\n  : \"None detected (All bars < 2 × avg volume)\";\n\n// -- Unusual Gap: any bar where |open − prev close| ÷ prev close ≥ 1%\nconst gapArr = [];\nfor (let i = 1; i < open.length; i++) {\n  const gap = Math.abs(open[i] - close[i - 1]) / close[i - 1];\n  if (gap >= 0.01) gapArr.push({ index: i, gap: Number((gap * 100).toFixed(2)), open: open[i], prevClose: close[i - 1] });\n}\nconst gapText = gapArr.length > 0\n  ? gapArr.map(g => `Bar ${g.index}: gap=${g.gap}%`).join(\"; \")\n  : \"None detected (All opens within 1% of prior close)\";\n\n// -- Bias\nlet bias = \"Neutral\";\nif (trend === \"Up\" && rsi14 <= 70 && macd.macd > 0) bias = \"Bullish\";\nif (trend === \"Down\" && rsi14 >= 30 && macd.macd < 0) bias = \"Bearish\";\n\n// -- Entry Price (last close)\nconst entryPrice = Number(close.at(-1).toFixed(2));\n\n// -- Stops/Targets\nlet stopLoss = null, takeProfit = null;\nif (bias === \"Bullish\") {\n  stopLoss = Number((support - 0.005 * support).toFixed(2));\n  takeProfit = Number((resistance + 0.01 * resistance).toFixed(2));\n} else if (bias === \"Bearish\") {\n  stopLoss = Number((support - 0.005 * support).toFixed(2));\n  takeProfit = Number((support - 0.01 * support).toFixed(2));\n} else {\n  stopLoss = \"N/A\";\n  takeProfit = \"N/A\";\n}\n\n// -- Output object\nreturn [{\n  json: {\n    Ticker: meta.symbol,\n    Name: meta.longName,\n    Timeframe: \"1h\",\n    Period: \"1mo\",\n    RSI_14: rsi14,\n    MACD: macd,\n    MA20: ma20,\n    MA20_slope: slope_ma20,\n    Volatility_ATR_pct: volatility,\n    Support: support,\n    Resistance: resistance,\n    Trend: trend,\n    Volume_Trend: volTrend,\n    Volume_SMA5: Math.round(smaVol5),\n    KeyPattern: keyPattern,\n    Bias: bias,\n    Entry_Price: entryPrice,\n    Stop_Loss: stopLoss,\n    Take_Profit: takeProfit,\n    Vol_Spike: volSpikes.length > 0 ? volSpikes : \"None\",\n    Unusual_Gap: gapArr.length > 0 ? gapArr : \"None\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        240
+      ],
+      "id": "dbc5ac88-c1b0-48aa-aa22-9303f6ef43b7",
+      "name": "Analysis 1H Candle data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// INPUT: Array as you posted above\nconst data = $input.first().json.chart.result[0];\nconst meta = data.meta;\nconst close = data.indicators.quote[0].close;\nconst open = data.indicators.quote[0].open;\nconst high = data.indicators.quote[0].high;\nconst low = data.indicators.quote[0].low;\nconst volume = data.indicators.quote[0].volume;\nconst timestamps = data.timestamp;\n\n// -- RSI(14)\nfunction calcRSI(closes, period = 14) {\n  if (closes.length < period + 1) return null;\n  let gains = 0, losses = 0;\n  for (let i = closes.length - period; i < closes.length; i++) {\n    const diff = closes[i] - closes[i - 1];\n    if (diff > 0) gains += diff;\n    else losses -= diff;\n  }\n  let avgGain = gains / period, avgLoss = losses / period;\n  let rs = avgGain / (avgLoss || 1e-9);\n  let rsi = 100 - (100 / (1 + rs));\n  return Number(rsi.toFixed(1));\n}\nconst rsi14 = calcRSI(close);\n\n// -- MACD\nfunction EMA(arr, period) {\n  const k = 2 / (period + 1);\n  let emaArr = [arr[0]];\n  for (let i = 1; i < arr.length; i++) {\n    emaArr.push(arr[i] * k + emaArr[i - 1] * (1 - k));\n  }\n  return emaArr;\n}\nfunction calcMACD(closes) {\n  if (closes.length < 26) return { macd: null, signal: null };\n  const ema12 = EMA(closes, 12);\n  const ema26 = EMA(closes, 26);\n  const macdArr = ema12.map((val, i) => val - (ema26[i] || 0));\n  const signalArr = EMA(macdArr, 9);\n  return {\n    macd: Number(macdArr.at(-1).toFixed(2)),\n    signal: Number(signalArr.at(-1).toFixed(2))\n  };\n}\nconst macd = calcMACD(close);\n\n// -- MA20 + slope\nfunction SMA(arr, period) {\n  if (arr.length < period) return null;\n  return arr.slice(-period).reduce((a, b) => a + b, 0) / period;\n}\nconst ma20 = Number(SMA(close, 20)?.toFixed(2));\nconst prev_ma20 = Number(SMA(close.slice(0, -1), 20)?.toFixed(2));\nconst slope_ma20 = (ma20 > prev_ma20) ? \"Up\" : (ma20 < prev_ma20) ? \"Down\" : \"Flat\";\n\n// -- Volatility (ATR%)\nfunction avgATRpct(highs, lows, closes) {\n  let tr = [];\n  for (let i = 1; i < closes.length; i++) {\n    const hl = highs[i] - lows[i];\n    const hc = Math.abs(highs[i] - closes[i - 1]);\n    const lc = Math.abs(lows[i] - closes[i - 1]);\n    tr.push(Math.max(hl, hc, lc) / closes[i] * 100);\n  }\n  return Number((tr.reduce((a, b) => a + b, 0) / tr.length).toFixed(2));\n}\nconst volatility = avgATRpct(high, low, close);\n\n// -- Support/Resistance\nconst support = Number(Math.min(...low).toFixed(2));\nconst resistance = Number(Math.max(...high).toFixed(2));\n\n// -- Trend\nlet trend = \"Sideways\";\nif (close.at(-1) > ma20 && slope_ma20 === \"Up\") trend = \"Up\";\nelse if (close.at(-1) < ma20 && slope_ma20 === \"Down\") trend = \"Down\";\n\n// -- Volume Trend (5-bar SMA)\nfunction SMAvol(volumes, period = 5) {\n  if (volumes.length < period) return null;\n  return volumes.slice(-period).reduce((a, b) => a + b, 0) / period;\n}\nconst smaVol5 = SMAvol(volume, 5);\nconst volTrend = volume.at(-1) > smaVol5 ? \"Up\" : \"Down\";\n\n// -- Key Pattern (last 30 bars)\nfunction getKeyPattern(highs, lows) {\n  const bars = 30;\n  if (highs.length < bars || lows.length < bars) return \"Not enough data\";\n  const h = highs.slice(-bars), l = lows.slice(-bars);\n  let up = true, down = true;\n  for (let i = 1; i < bars; i++) {\n    if (h[i] <= h[i - 1] || l[i] <= l[i - 1]) up = false;\n    if (h[i] >= h[i - 1] || l[i] >= l[i - 1]) down = false;\n  }\n  if (up) return \"Up-channel\";\n  if (down) return \"Down-channel\";\n  return \"Sideways consolidation\";\n}\nconst keyPattern = getKeyPattern(high, low);\n\n// -- Volume Spike: any bar where volume >= 2 × avg volume\nconst avgVol = volume.reduce((a, b) => a + b, 0) / volume.length;\nconst volSpikes = [];\nfor (let i = 0; i < volume.length; i++) {\n  if (volume[i] >= 2 * avgVol) {\n    volSpikes.push({ bar: i, volume: volume[i], avg: avgVol });\n  }\n}\nconst volSpikeText = volSpikes.length > 0\n  ? volSpikes.map(v => `Bar ${v.bar}: vol=${v.volume}, avg=${Math.round(v.avg)}`).join(\"; \")\n  : \"None detected (All bars < 2 × avg volume)\";\n\n// -- Unusual Gap: any bar where |open − prev close| ÷ prev close ≥ 1%\nconst gapArr = [];\nfor (let i = 1; i < open.length; i++) {\n  const gap = Math.abs(open[i] - close[i - 1]) / close[i - 1];\n  if (gap >= 0.01) gapArr.push({ index: i, gap: Number((gap * 100).toFixed(2)), open: open[i], prevClose: close[i - 1] });\n}\nconst gapText = gapArr.length > 0\n  ? gapArr.map(g => `Bar ${g.index}: gap=${g.gap}%`).join(\"; \")\n  : \"None detected (All opens within 1% of prior close)\";\n\n// -- Bias\nlet bias = \"Neutral\";\nif (trend === \"Up\" && rsi14 <= 70 && macd.macd > 0) bias = \"Bullish\";\nif (trend === \"Down\" && rsi14 >= 30 && macd.macd < 0) bias = \"Bearish\";\n\n// -- Entry Price (last close)\nconst entryPrice = Number(close.at(-1).toFixed(2));\n\n// -- Stops/Targets\nlet stopLoss = null, takeProfit = null;\nif (bias === \"Bullish\") {\n  stopLoss = Number((support - 0.005 * support).toFixed(2));\n  takeProfit = Number((resistance + 0.01 * resistance).toFixed(2));\n} else if (bias === \"Bearish\") {\n  stopLoss = Number((support - 0.005 * support).toFixed(2));\n  takeProfit = Number((support - 0.01 * support).toFixed(2));\n} else {\n  stopLoss = \"N/A\";\n  takeProfit = \"N/A\";\n}\n\n// -- Output object\nreturn [{\n  json: {\n    Ticker: meta.symbol,\n    Name: meta.longName,\n    Timeframe: \"15m\",\n    Period: \"7d\",\n    RSI_14: rsi14,\n    MACD: macd,\n    MA20: ma20,\n    MA20_slope: slope_ma20,\n    Volatility_ATR_pct: volatility,\n    Support: support,\n    Resistance: resistance,\n    Trend: trend,\n    Volume_Trend: volTrend,\n    Volume_SMA5: Math.round(smaVol5),\n    KeyPattern: keyPattern,\n    Bias: bias,\n    Entry_Price: entryPrice,\n    Stop_Loss: stopLoss,\n    Take_Profit: takeProfit,\n    Vol_Spike: volSpikes.length > 0 ? volSpikes : \"None\",\n    Unusual_Gap: gapArr.length > 0 ? gapArr : \"None\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        -32
+      ],
+      "id": "2728700a-7e74-4205-a3bc-95f10376699b",
+      "name": "Analysis 15M Candle data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const close = $input.first().json.chart.result[0].indicators.quote[0].close;\nconst open = $input.first().json.chart.result[0].indicators.quote[0].open;\nconst high = $input.first().json.chart.result[0].indicators.quote[0].high;\nconst low = $input.first().json.chart.result[0].indicators.quote[0].low;\nconst volume = $input.first().json.chart.result[0].indicators.quote[0].volume;\nconst timestamps = $input.first().json.chart.result[0].timestamp;\n\nconst ticker = $input.first().json.chart.result[0].meta.symbol;\nconst longName = $input.first().json.chart.result[0].meta.longName;\n\n// RSI\nfunction calcRSI(closes, period=14) {\n  if (closes.length < period+1) return null;\n  let gains = 0, losses = 0;\n  for (let i=1; i<=period; i++) {\n    const diff = closes[i] - closes[i-1];\n    if (diff > 0) gains += diff; else losses -= diff;\n  }\n  let avgGain = gains / period, avgLoss = losses / period;\n  let rs = avgGain / (avgLoss || 1e-9);\n  let rsi = 100 - (100 / (1 + rs));\n  return Number(rsi.toFixed(2));\n}\nconst rsi14 = calcRSI(close.slice(-15));\n\n// MACD\nfunction EMA(arr, period) {\n  const k = 2 / (period + 1);\n  let emaArr = [arr[0]];\n  for (let i=1; i<arr.length; i++) {\n    emaArr.push(arr[i]*k + emaArr[i-1]*(1-k));\n  }\n  return emaArr;\n}\nfunction calcMACD(closes) {\n  const ema12 = EMA(closes, 12);\n  const ema26 = EMA(closes, 26);\n  const macd = ema12.map((val,i) => val-(ema26[i]||0));\n  const signal = EMA(macd, 9);\n  return { macd: Number(macd.at(-1).toFixed(2)), signal: Number(signal.at(-1).toFixed(2)) };\n}\nconst macd = calcMACD(close);\n\n// MA50, MA200\nfunction SMA(arr, period) {\n  if (arr.length < period) return null;\n  return arr.slice(-period).reduce((a,b)=>a+b,0)/period;\n}\nconst ma50 = Number(SMA(close, 50)?.toFixed(2));\nconst ma200 = Number(SMA(close, 200)?.toFixed(2));\n\n// MA slopes\nconst prev_ma50 = Number(SMA(close.slice(0,-1), 50)?.toFixed(2));\nconst prev_ma200 = Number(SMA(close.slice(0,-1), 200)?.toFixed(2));\nconst slope50 = ma50 > prev_ma50 ? \"Up\" : \"Down\";\nconst slope200 = ma200 > prev_ma200 ? \"Up\" : \"Down\";\n\n// Volatility (ATR%)\nfunction avgATRpct(highs, lows, closes) {\n  let tr = [];\n  for (let i=1; i<closes.length; i++) {\n    const hl = highs[i]-lows[i];\n    const hc = Math.abs(highs[i]-closes[i-1]);\n    const lc = Math.abs(lows[i]-closes[i-1]);\n    tr.push(Math.max(hl, hc, lc) / closes[i] * 100);\n  }\n  return Number((tr.reduce((a,b)=>a+b,0)/tr.length).toFixed(2));\n}\nconst volatility = avgATRpct(high, low, close);\n\n// Support/Resistance\nconst support = Number(Math.min(...low.slice(-60)).toFixed(2)); // laatste 60 dagen\nconst resistance = Number(Math.max(...high.slice(-60)).toFixed(2));\n\n// 52-week high/low\nconst week52high = Number(Math.max(...close.slice(-260)).toFixed(2));\nconst week52low = Number(Math.min(...close.slice(-260)).toFixed(2));\n\n// Trend\nlet trend = \"Sideways\";\nif (slope200 === \"Up\" && close.at(-1) > ma200) trend = \"Up\";\nif (slope200 === \"Down\" && close.at(-1) < ma200) trend = \"Down\";\n\n// Volume Trend\nfunction SMAvol(volumes, period=20) {\n  if (volumes.length < period) return null;\n  return volumes.slice(-period).reduce((a,b)=>a+b,0)/period;\n}\nconst smaVol20 = SMAvol(volume, 20);\nconst volTrend = volume.at(-1) > smaVol20 ? \"Up\" : \"Down\";\n\n// Volume Spike\nconst volSpike = volume.slice(-60).map((v,i,arr) => {\n  const avg = SMAvol(arr.slice(Math.max(0,i-19), i+1), 20);\n  if (v >= 2 * avg) return { bar: i, volume: v, avg: avg };\n  return null;\n}).filter(x=>x);\n\n// Unusual Gap\nconst gaps = [];\nfor (let i=1;i<open.length;i++) {\n  const gap = Math.abs(open[i] - close[i-1]) / close[i-1];\n  if (gap >= 0.01) gaps.push({ index: i, gap: Number((gap*100).toFixed(2)), date: timestamps[i] });\n}\n\n// === Bias calculation ===\nlet bias = \"Neutral\";\nif (trend === \"Up\" && rsi14 <= 70 && macd.macd > 0) bias = \"Bullish\";\nif (trend === \"Down\" && rsi14 >= 30 && macd.macd < 0) bias = \"Bearish\";\n\n// === Entry price (use latest close) ===\nconst entryPrice = Number(close.at(-1).toFixed(2));\n\n// === Stop loss & Take profit ===\nlet stopLoss = null, takeProfit = null;\nif (bias === \"Bullish\") {\n  stopLoss = Number((support * 0.99).toFixed(2));\n  takeProfit = Number((resistance * 1.02).toFixed(2));\n} else if (bias === \"Bearish\") {\n  stopLoss = Number((support * 0.99).toFixed(2));\n  takeProfit = Number((resistance * 0.98).toFixed(2));\n} else {\n  stopLoss = \"N/A\";\n  takeProfit = \"N/A\";\n}\n\nreturn [{\n  json: {\n    Ticker: ticker,    \n    Name: longName,\n    Timeframe: \"1d\",\n    Period: \"1y\",\n    Description: \"1d candle data for the past year\",\n    RSI_14: rsi14,\n    MACD: macd,\n    MA50: ma50,\n    MA50_slope: slope50,\n    MA200: ma200,\n    MA200_slope: slope200,\n    Volatility_ATR_pct: volatility,\n    Support: support,\n    Resistance: resistance,\n    week52high,\n    week52low,\n    Trend: trend,\n    Volume_Trend: volTrend,\n    Volume_SMA20: Math.round(smaVol20),\n    Bias: bias,\n    Entry_Price: entryPrice,\n    Stop_Loss: stopLoss,\n    Take_Profit: takeProfit,\n    Vol_Spike: volSpike.length > 0 ? volSpike : \"None\",\n    Unusual_Gap: gaps.length > 0 ? gaps : \"None\",\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        480
+      ],
+      "id": "a8ce9576-e716-48ce-9413-00579a047fa9",
+      "name": "Analysis 1D Candle data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const close = $input.first().json.chart.result[0].indicators.quote[0].close;\nconst open = $input.first().json.chart.result[0].indicators.quote[0].open;\nconst high = $input.first().json.chart.result[0].indicators.quote[0].high;\nconst low = $input.first().json.chart.result[0].indicators.quote[0].low;\nconst volume = $input.first().json.chart.result[0].indicators.quote[0].volume;\nconst timestamps = $input.first().json.chart.result[0].timestamp;\n\nconst ticker = $input.first().json.chart.result[0].meta.symbol;\nconst longName = $input.first().json.chart.result[0].meta.longName;\n\n// RSI (14, last value)\nfunction calcRSI(closes, period=14) {\n  if (closes.length < period+1) return null;\n  let gains = 0, losses = 0;\n  for (let i=1; i<=period; i++) {\n    const diff = closes[closes.length - period - 1 + i] - closes[closes.length - period - 2 + i];\n    if (diff > 0) gains += diff; else losses -= diff;\n  }\n  let avgGain = gains / period, avgLoss = losses / period;\n  let rs = avgGain / (avgLoss || 1e-9);\n  let rsi = 100 - (100 / (1 + rs));\n  return Number(rsi.toFixed(2));\n}\nconst rsi14 = calcRSI(close, 14);\n\n// MACD (last value)\nfunction EMA(arr, period) {\n  const k = 2 / (period + 1);\n  let emaArr = [arr[0]];\n  for (let i=1; i<arr.length; i++) {\n    emaArr.push(arr[i]*k + emaArr[i-1]*(1-k));\n  }\n  return emaArr;\n}\nfunction calcMACD(closes) {\n  if (closes.length < 26) return {macd: null, signal: null};\n  const ema12 = EMA(closes, 12);\n  const ema26 = EMA(closes, 26);\n  const macd = ema12.map((val,i) => val-(ema26[i]||0));\n  const signal = EMA(macd, 9);\n  return { \n    macd: Number(macd.at(-1).toFixed(2)), \n    signal: Number(signal.at(-1).toFixed(2)) \n  };\n}\nconst macd = calcMACD(close);\n\n// MA50, MA200 (use last 50/200 values)\nfunction SMA(arr, period) {\n  if (arr.length < period) return null;\n  return arr.slice(-period).reduce((a,b)=>a+b,0)/period;\n}\nconst ma50 = Number(SMA(close, 50)?.toFixed(2));\nconst ma200 = Number(SMA(close, 200)?.toFixed(2));\n\n// MA slopes\nconst prev_ma50 = Number(SMA(close.slice(0,-1), 50)?.toFixed(2));\nconst prev_ma200 = Number(SMA(close.slice(0,-1), 200)?.toFixed(2));\nconst slope50 = ma50 > prev_ma50 ? \"Up\" : \"Down\";\nconst slope200 = ma200 > prev_ma200 ? \"Up\" : \"Down\";\n\n// Volatility (ATR%)\nfunction avgATRpct(highs, lows, closes) {\n  let tr = [];\n  for (let i=1; i<closes.length; i++) {\n    const hl = highs[i]-lows[i];\n    const hc = Math.abs(highs[i]-closes[i-1]);\n    const lc = Math.abs(lows[i]-closes[i-1]);\n    tr.push(Math.max(hl, hc, lc) / closes[i] * 100);\n  }\n  return Number((tr.reduce((a,b)=>a+b,0)/tr.length).toFixed(2));\n}\nconst volatility = avgATRpct(high, low, close);\n\n// Support/Resistance: last 252 bars for 1-year, or increase to last 260 for full year\nconst support = Number(Math.min(...low.slice(-252)).toFixed(2));\nconst resistance = Number(Math.max(...high.slice(-252)).toFixed(2));\n\n// 52-week high/low: use last 252-260 closes for trading year\nconst week52high = Number(Math.max(...close.slice(-260)).toFixed(2));\nconst week52low = Number(Math.min(...close.slice(-260)).toFixed(2));\n\n// Trend\nlet trend = \"Sideways\";\nif (slope200 === \"Up\" && close.at(-1) > ma200) trend = \"Up\";\nif (slope200 === \"Down\" && close.at(-1) < ma200) trend = \"Down\";\n\n// Volume Trend\nfunction SMAvol(volumes, period=20) {\n  if (volumes.length < period) return null;\n  return volumes.slice(-period).reduce((a,b)=>a+b,0)/period;\n}\nconst smaVol20 = SMAvol(volume, 20);\nconst volTrend = volume.at(-1) > smaVol20 ? \"Up\" : \"Down\";\n\n// Volume Spike: last 252 bars for recent year\nconst volSpike = volume.slice(-252).map((v,i,arr) => {\n  const avg = SMAvol(arr.slice(Math.max(0,i-19), i+1), 20);\n  if (avg && v >= 2 * avg) return { bar: i, volume: v, avg: avg };\n  return null;\n}).filter(x=>x);\n\n// Unusual Gap: on all bars (could be thousands in 5y)\nconst gaps = [];\nfor (let i=1;i<open.length;i++) {\n  const gap = Math.abs(open[i] - close[i-1]) / close[i-1];\n  if (gap >= 0.01) gaps.push({ index: i, gap: Number((gap*100).toFixed(2)), date: timestamps[i] });\n}\n\n// === Bias calculation ===\nlet bias = \"Neutral\";\nif (trend === \"Up\" && rsi14 <= 70 && macd.macd > 0) bias = \"Bullish\";\nif (trend === \"Down\" && rsi14 >= 30 && macd.macd < 0) bias = \"Bearish\";\n\n// === Entry price (use latest close) ===\nconst entryPrice = Number(close.at(-1).toFixed(2));\n\n// === Stop loss & Take profit ===\nlet stopLoss = null, takeProfit = null;\nif (bias === \"Bullish\") {\n  stopLoss = Number((support * 0.99).toFixed(2));\n  takeProfit = Number((resistance * 1.02).toFixed(2));\n} else if (bias === \"Bearish\") {\n  stopLoss = Number((support * 0.99).toFixed(2));\n  takeProfit = Number((resistance * 0.98).toFixed(2));\n} else {\n  stopLoss = \"N/A\";\n  takeProfit = \"N/A\";\n}\n\nreturn [{\n  json: {\n    Ticker: ticker,    \n    Name: longName,\n    Timeframe: \"1w\",\n    Period: \"5y\",\n    Description: \"1w candle data for the past 5 years\",\n    RSI_14: rsi14,\n    MACD: macd,\n    MA50: ma50,\n    MA50_slope: slope50,\n    MA200: ma200,\n    MA200_slope: slope200,\n    Volatility_ATR_pct: volatility,\n    Support: support,\n    Resistance: resistance,\n    week52high,\n    week52low,\n    Trend: trend,\n    Volume_Trend: volTrend,\n    Volume_SMA20: Math.round(smaVol20),\n    Bias: bias,\n    Entry_Price: entryPrice,\n    Stop_Loss: stopLoss,\n    Take_Profit: takeProfit,\n    Vol_Spike: volSpike.length > 0 ? volSpike : \"None\",\n    Unusual_Gap: gaps.length > 0 ? gaps : \"None\",\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        736
+      ],
+      "id": "e1e66b67-b91a-45b3-9ad6-85f94f51c8c8",
+      "name": "Analysis 1W Candle data"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=ShortTerm Data:\n{{ $json.ShortTermAnalysis }}\n\n\n\nSentiment:\n{{ $json.SentimentAnalysis }}\n\n\n\nLongTerm Data:\n{{ $json.LongTermAnalysis }}\n",
+        "options": {
+          "systemMessage": "=You are a professional trading analyst and report generator for financial markets. Your task is to analyze provided technical and sentiment data for a stock and produce a structured markdown report for clients.\nYou always follow the exact formatting and example shown below. Do not skip or combine any sections. Every section and heading must be included, even if data is missing.\n\nInstructions\n\n1. Executive Summary\n\n- Start with a short executive summary (2–3 lines) covering the overall technical and sentiment picture for the stock.\n- Add the analysis date (YYYY-MM-DD) and mention current market context (e.g., pre-open, macro news, sector moves).\n\n2. Major Risks / Catalysts\n\n- List any major technical, legal, or macro risks or catalysts based on the latest data or news.\n\n3. Short-Term Data\n\n- Label this section clearly.\n- Start with a brief short-term outlook (1–2 lines), e.g.:\n“AAPL displays a bearish momentum on the 15-minute (7d) chart but bullish strength on the 1-hour (1mo) chart, with significant volume spikes recently detected on both intervals.”\n- Short-Term Outlook Table (show 15m/7d and 1h/1mo side-by-side):\n\nTrend (15m, 7d): ...\nTrend (1h, 1mo): ...\n\nSupport (15m, 7d): ...\nSupport (1h, 1mo): ...\n\nResistance (15m, 7d): ...\nResistance (1h, 1mo): ...\n\nVolatility_ATR_pct (15m, 7d): ...\nVolatility_ATR_pct (1h, 1mo): ...\n\nAverage Volume (SMA 5) (15m, 7d): ...\nAverage Volume (SMA 5) (1h, 1mo): ...\n\nTechnical Summary:\nList all key indicators for both intervals, always with value, interval/range, and short commentary:\n\nRSI (15m, 7d): ... (comment)\nRSI (1h, 1mo): ... (comment)\n\nMACD (15m, 7d): ... (comment)\nMACD (1h, 1mo): ... (comment)\n\nMA20 (15m, 7d): ... (Slope: ...)\nMA20 (1h, 1mo): ... (Slope: ...)\n\nVolume_Trend (15m, 7d): ... (comment)\nVolume_Trend (1h, 1mo): ... (comment)\n\nKey Pattern (15m, 7d): ...\nKey Pattern (1h, 1mo): ...\n\n\nShort-Term Trading Plan:\n\n\nTrading Plan (15m, 7d):\n\nBias: ...\nEntry Price: ...\nStop Loss: ...\nTake Profit: ...\n\nTrading Plan (1h, 1mo):\n\nBias: ...\nEntry Price: ...\nStop Loss: ...\nTake Profit: ...\n\nAdd in one concise line how these values are determined (referencing trend, RSI, MACD, support/resistance, and rules).\ndo not add Calculated as: (number)\n\n- Key Observations:\n\n  - Volume Spike (15m, 7d): Yes/No, specify bar(s) and relative size if present.\n  - Unusual Gap (15m, 7d): Yes/No, specify bar(s) and % gap if present.\n  - Volume Spike (1h, 1mo): Yes/No, specify bar(s) and relative size if present.\n  - Unusual Gap (1h, 1mo): Yes/No, specify bar(s) and % gap if present.\n\n- Conclusion:\n1–2 lines recapping main signals, highlighting risk/reward and noting significant spikes/gaps.\n\n- For each indicator, add a short comment on whether the value is positive, negative, or neutral for the outlook, based strictly on its number and definition (e.g. “RSI 67: Slightly overbought, neutral to positive for momentum”).\n\n\n4. Sentiment Analysis (Short Term)\n\n- Label as: Sentiment Analysis (Short Term)\n- Category: (Positive/Neutral/Negative)\n- Score: (between -1 and 1)\n- Bias: (Bullish/Bearish/Uncertain)\n- Rationale: Give a concise, evidence-based paragraph, referencing specific events or news. If no actionable news, explain why it is neutral.\n\n\n5. Long-Term Data\n\n- Label this section clearly.\n- Context:\n1–2 lines summarizing the long-term structure, e.g.:\n“AAPL exhibits a bullish structure on daily (1D, 1Y) and weekly (1W, 5Y) timeframes, with an upward trend supported by positive technical indicators.”\n- Long-Term Outlook Table (show 1D/1Y and 1W/5Y side-by-side):\n\n\nTrend (1D, 1Y): ...\nTrend (1W, 5Y): ...\n\nMajor Support (1D, 1Y): ...\nMajor Support (1W, 5Y): ...\n\nMajor Resistance (1D, 1Y): ...\nMajor Resistance (1W, 5Y): ...\n\n52-Week High (1D, 1Y): ...\n52-Week Low (1D, 1Y): ...\n\nAverage Daily Volume (1D, 1Y): ...\nAverage Daily Volume (1W, 5Y): ...\n\nVolatility_ATR_pct (1D, 1Y): ...\nVolatility_ATR_pct (1W, 5Y): ...\n\n\nTechnical Summary:\n\n\nRSI (1D, 1Y): ... (comment)\nRSI (1W, 5Y): ... (comment)\n\nMACD (1D, 1Y): ... (comment)\nMACD (1W, 5Y): ... (comment)\n\nMA50 (1D, 1Y): ... (Slope: ...)\nMA50 (1W, 5Y): ... (Slope: ...)\n\nMA200 (1D, 1Y): ... (Slope: ...)\nMA200 (1W, 5Y): ... (Slope: ...)\n\nVolume_Trend (1D, 1Y): ... (comment)\nVolume_Trend (1W, 5Y): ... (comment)\n\n\nLong-Term Trading Plan (1W, 5Y):\n\n\nBias: Bullish / Bearish / Neutral (based on the defined rules)\nEntry Price: ...\nStop Loss: ...\nTake Profit: ...\nPosition Sizing: ...\nRisk/Reward: ...\n\nExplain, in one sentence, how these are determined (trend, RSI, MACD, support/resistance, and rules).\n\n\n- Key Observations (1D, 1Y):\n\n  - Volume Spike: Yes/No, give details if present.\n  - Unusual Gap: Yes/No, give details if present.\n\n- Conclusion:\n\n1–2 factual sentences that recap the overall risk/reward and main signals from both intervals.\n\n6. Next Steps / Actionable Alerts\n\n  - Clearly state what the reader should watch for or do next.\n\n7. Sources and Disclaimer\n\n  - List data sources (e.g., Yahoo Finance, AI analysis) and remind that this is not investment advice.\n\n\nExample output:\n\n\n**AAPL Multi-Timeframe Analysis — Executive Summary**\n\nApple Inc. (AAPL) currently shows divergent short- and long-term technical signals. Short-term, the 15-minute (7d) chart is bearish, while the 1-hour (1mo) chart is showing signs of bullish reversal. Long-term, both daily (1D, 1Y) and weekly (1W, 5Y) charts point to an overall bullish structure. Sentiment remains mixed, and recent volume spikes indicate caution is warranted.\n\n\n**Analysis Date:** 2025-06-04  \n**Market Context:** NASDAQ pre-open; tech sector stable, some macro caution on inflation data.\n\n\n\n**Major Risks / Catalysts:**\n\n- Multiple short-term volume spikes may precede sharp moves or reversals.\n- Macro events: Upcoming Fed announcements and CPI data.\n- Sector-wide volatility from AI-related news or regulation.\n\n\n**Short-Term Data**\n\n**Short-Term Outlook (15m/1h):**  \n\nAAPL displays a bearish momentum on the 15-minute (7d) chart but bullish strength on the 1-hour (1mo) chart, with significant volume spikes recently detected on both intervals.\n\n\n- **Trend (15m, 7d):** Down  \n- **Trend (1h, 1mo):** Up\n\n- **Support (15m, 7d):** $196.78  \n- **Support (1h, 1mo):** $193.25\n\n- **Resistance (15m, 7d):** $206.24  \n- **Resistance (1h, 1mo):** $213.94\n\n- **Volatility_ATR_pct (15m, 7d):** 0.32%  \n- **Volatility_ATR_pct (1h, 1mo):** 0.79%\n\n- **Average Volume (SMA 5) (15m, 7d):** 1,058,040  \n- **Average Volume (SMA 5) (1h, 1mo):** 2,381,262\n\n\n\n**Technical Summary:**\n\n\n- **RSI (15m, 7d):** 49.8 (neutral, sideways momentum)\n- **RSI (1h, 1mo):** 57.2 (positive for bullish continuation)\n\n- **MACD (15m, 7d):** -0.11 (bearish, momentum fading)\n- **MACD (1h, 1mo):** 0.66 (bullish, positive crossover)\n\n- **MA20 (15m, 7d):** $203.13 (Slope: Down, negative)\n- **MA20 (1h, 1mo):** $202.73 (Slope: Up, positive)\n\n- **Volume_Trend (15m, 7d):** Down (neutral to negative)\n- **Volume_Trend (1h, 1mo):** Down (neutral to negative)\n\n- **Key Pattern (15m, 7d):** Sideways consolidation\n- **Key Pattern (1h, 1mo):** Sideways consolidation\n\n\n**Short-Term Trading Plan:**\n\n**Trading Plan (15m, 7d):**  \n- Bias: Bearish  \n- Entry Price: $202.82  \n- Stop Loss: $195.80  \n- Take Profit: $194.81\n\n**Trading Plan (1h, 1mo):**  \n- Bias: Bullish  \n- Entry Price: $202.82  \n- Stop Loss: $192.28  \n- Take Profit: $216.08\n\n*Bias is set based on trend, RSI, and MACD. Entry is the latest close, stop-loss just below support, and take-profit near the next resistance (or calculated as per rules if not available).*\n\n\n**Key Observations:**\n\n- **Volume Spike (15m, 7d):** Yes (e.g. bar 0: 6,398,376 vs avg 1,426,552)\n\n- **Unusual Gap (15m, 7d):** Yes (bar 52: 1.57%)\n\n- **Volume Spike (1h, 1mo):** Yes (e.g. bar 0: 17,363,317 vs avg 5,871,595)\n\n- **Unusual Gap (1h, 1mo):** Yes (bar 35: 6.26%, bar 98: 3.83%, etc.)\n\n\n\n**Conclusion:**  \n\nThe 15m chart signals bearish short-term risk with active selling and multiple large volume spikes, while the 1h chart suggests early signs of recovery. Monitor both intervals closely for momentum shifts and manage risk accordingly.\n\n\n\n**Sentiment Analysis (Short Term)**\n\n- **Category:** Neutral\n- **Score:** 0.1\n- **Bias:** Uncertain\n- **Rationale:**  \n\n  Recent headlines about AAPL focus on mixed consumer demand trends and new product launches. No major price-moving news, but volatility in the sector due to macroeconomic factors. Sentiment is therefore neutral to cautious until clearer direction emerges.\n\n\n\n**Long-Term Data**\n\n**Context:**  \nAAPL exhibits a bullish structure on daily (1D, 1Y) and weekly (1W, 5Y) timeframes, with an upward trend supported by positive technical indicators.\n\n\n**Long-Term Outlook:**\n\n- **Trend (1D, 1Y):** Up\n- **Trend (1W, 5Y):** Up\n\n- **Major Support (1D, 1Y):** $161.38\n- **Major Support (1W, 5Y):** $81.43\n\n- **Major Resistance (1D, 1Y):** $214.84\n- **Major Resistance (1W, 5Y):** $242.52\n\n- **52-Week High (1D, 1Y):** $242.06\n- **52-Week Low (1D, 1Y):** $161.02\n\n- **Average Daily Volume (1D, 1Y):** 40,566,197\n- **Average Daily Volume (1W, 5Y):** 213,824,302\n\n- **Volatility_ATR_pct (1D, 1Y):** 2.90%\n- **Volatility_ATR_pct (1W, 5Y):** 6.89%\n\n\n**Technical Summary:**\n\n- **RSI (1D, 1Y):** 44.47 (neutral, no overbought/oversold signal)\n- **RSI (1W, 5Y):** 54.06 (neutral to positive for momentum)\n\n- **MACD (1D, 1Y):** 3.89 (positive momentum)\n- **MACD (1W, 5Y):** -0.57 (negative momentum but improving)\n\n- **MA50 (1D, 1Y):** $192.39 (Slope: Up, positive)\n- **MA50 (1W, 5Y):** $199.47 (Slope: Up, positive)\n\n- **MA200 (1D, 1Y):** $201.88 (Slope: Up, positive)\n- **MA200 (1W, 5Y):** $154.14 (Slope: Up, positive)\n\n- **Volume_Trend (1D, 1Y):** Down (slightly negative)\n- **Volume_Trend (1W, 5Y):** Down (slightly negative)\n\n\n**Long-Term Trading Plan:**\n\n- Bias: Neutral (uptrend, neutral RSI, negative MACD)\n- Entry Price: $207.23\n- Stop Loss: N/A\n- Take Profit: N/A\n\n- Position Sizing: ≤ 1.5% of portfolio per trade\n- Risk/Reward: Unclear; wait for confirmation above resistance for new long setups\n\n*The bias is determined by trend, RSI, and MACD. Entry price is set at the latest weekly close. Due to the analysis, Stop Loss and Take Profit specifics are not available.*\n\n\n\n**Key Observations (1D, 1Y):**\n\n- Volume Spike: Yes (e.g., Bar 19: 109,327,100 vs avg 53,763,965)\n\n- Unusual Gap: Yes (e.g., +9.41% at index 40, date 1722605400)\n\n\n**Conclusion:**  \nBoth daily and weekly analyses suggest a bullish technical setup with moderate risk. Monitoring volume spikes and large price gaps are essential for detecting potential trend reversals.\n\n\n**Next Steps / Actionable Alerts**\n\n- Monitor for a daily close above $214.84 to confirm renewed bullish momentum.\n\n- Reassess position sizing and risk if there is a regulatory update or sharp move in tech sector indices.\n\n- Reevaluate sentiment after next earnings or major headline event.\n\n\n*Data sources: Yahoo Finance, custom AI news analysis. Not investment advice. Use at your own risk.*\n\n\nOutput rules: \n\n- For the key observations ONLY give the biggest volume spike and the most unusual gap!\n- All numeric outputs: round to 2 decimals.\n- If a metric is missing, state N/A.\n- All metrics must clearly mention the interval and range used.\n- No generic fluff—only precise, actionable insights.\n\nOutput format: \n\nFormat the report in well-structured Markdown, clearly using bold for headers and clear bullet/line separation for each metric. NEVER use a markdown table, ONLY use the given output format that is used in the example:\n\n\nThe Analysis date is always: {{ $now }}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1824,
+        608
+      ],
+      "id": "891d00f2-b199-49f0-98d7-156c8f7b9c95",
+      "name": "Full Analysis"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search ticker on yahoo finance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Set Ticker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter News Articles": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Merge Data",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge Data": {
+      "main": [
+        [
+          {
+            "node": "Combine Stock Data with Sentiment Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Full Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stock Articles": {
+      "main": [
+        [
+          {
+            "node": "Filter News Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1 Week Candles": {
+      "main": [
+        [
+          {
+            "node": "Analysis 1W Candle data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1 Day candles": {
+      "main": [
+        [
+          {
+            "node": "Analysis 1D Candle data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1 Hour Candles": {
+      "main": [
+        [
+          {
+            "node": "Analysis 1H Candle data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "15 Minute Candles": {
+      "main": [
+        [
+          {
+            "node": "Analysis 15M Candle data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Chart for 1D Data": {
+      "main": [
+        [
+          {
+            "node": "Send First chart 1D",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Combine Short-term Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Short-term Data": {
+      "main": [
+        [
+          {
+            "node": "Short-Term Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Combine Long-term Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Chart for 1W data": {
+      "main": [
+        [
+          {
+            "node": "Send Second chart 1W",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Long-term Data": {
+      "main": [
+        [
+          {
+            "node": "Long-Term Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Stock Data with Sentiment Data": {
+      "main": [
+        [
+          {
+            "node": "Full Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Get the correct date",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get the correct date1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Short-Term Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the correct date": {
+      "main": [
+        [
+          {
+            "node": "Create Chart for 1D Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Long-Term Analysis": {
+      "main": [
+        [
+          {
+            "node": "Merge Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Short-Term Analysis": {
+      "main": [
+        [
+          {
+            "node": "Merge Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Long-Term Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Telegram Message": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the correct date1": {
+      "main": [
+        [
+          {
+            "node": "Create Chart for 1W data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Ticker": {
+      "main": [
+        [
+          {
+            "node": "15 Minute Candles",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "1 Hour Candles",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "1 Day candles",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "1 Week Candles",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Stock Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search ticker on yahoo finance": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analysis 1H Candle data": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Analysis 15M Candle data": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analysis 1D Candle data": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analysis 1W Candle data": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Full Analysis": {
+      "main": [
+        [
+          {
+            "node": "Split Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8785f050-4647-4131-86b7-fa3673f0229c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b12195067235351c1ee76c4fbf27fdfb2cebcc169a0d0fc6cb767999437c2724"
+  },
+  "id": "0FdSDA0aKPNxG9SF",
+  "tags": []
+}
